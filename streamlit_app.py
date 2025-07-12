@@ -6,18 +6,15 @@ from datetime import datetime
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
 
-# CSS con gradiente "Forest Twilight" – scuro, elegante, con contrasto
+# CSS professionale
 st.markdown("""
     <style>
     html, body, [class*="css"]  {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        font-family: 'sans-serif';
+        font-family: 'Segoe UI', sans-serif;
     }
 
     .stApp {
-        background: linear-gradient(135deg, #263238, #2e7d32, #004d40);
+        background: linear-gradient(135deg, #1b5e20, #2e7d32);
         background-size: 400% 400%;
         animation: gradientBG 30s ease infinite;
     }
@@ -27,62 +24,94 @@ st.markdown("""
         50% {background-position: 100% 50%;}
         100% {background-position: 0% 50%;}
     }
+
+    h1, h2, h3, h4 {
+        color: #ffffff;
+        font-weight: 600;
+        margin-bottom: 0.2em;
+    }
+
+    .section-box {
+        background-color: rgba(255, 255, 255, 0.06);
+        padding: 1.5em;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        margin-bottom: 1.5em;
+        color: #fff;
+    }
+
+    .section-title {
+        font-size: 1.3em;
+        margin-bottom: 1em;
+        color: #ffffff;
+        border-left: 5px solid #81c784;
+        padding-left: 0.5em;
+    }
+
+    label {
+        font-weight: 500;
+        color: #eeeeee !important;
+    }
+
+    .stTextInput > div > input,
+    .stNumberInput > div > div > input {
+        background-color: #263238;
+        color: #ffffff;
+        border: none;
+        border-radius: 6px;
+        padding: 0.5em;
+    }
+
+    .stDownloadButton button, .stButton button {
+        background-color: #263238;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.6em 1.2em;
+        margin-top: 1em;
+    }
+
+    .stDownloadButton button:hover, .stButton button:hover {
+        background-color: #37474f;
+        color: white;
+    }
+
+    .footer-note {
+        font-size: 0.85em;
+        color: #cccccc;
+        text-align: right;
+        margin-top: 2em;
+    }
     </style>
 """, unsafe_allow_html=True)
 
 # Funzione per valutare la salute della pianta
 def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     score = 0
+    if fvfm >= 0.80: score += 2
+    elif fvfm >= 0.75: score += 1
+    else: score -= 1
 
-    # Fv/Fm
-    if fvfm >= 0.80:
-        score += 2
-    elif fvfm >= 0.75:
-        score += 1
-    else:
-        score -= 1
+    if chl_tot >= 1.5: score += 2
+    elif chl_tot >= 1.0: score += 1
+    else: score -= 1
 
-    # Chl TOT
-    if chl_tot >= 1.5:
-        score += 2
-    elif chl_tot >= 1.0:
-        score += 1
-    else:
-        score -= 1
+    if car_tot >= 0.5: score += 2
+    elif car_tot >= 0.3: score += 1
+    else: score -= 1
 
-    # CAR TOT
-    if car_tot >= 0.5:
-        score += 2
-    elif car_tot >= 0.3:
-        score += 1
-    else:
-        score -= 1
+    if spad >= 40: score += 2
+    elif spad >= 30: score += 1
+    else: score -= 1
 
-    # SPAD
-    if spad >= 40:
-        score += 2
-    elif spad >= 30:
-        score += 1
-    else:
-        score -= 1
+    if qp >= 0.7: score += 2
+    elif qp >= 0.5: score += 1
+    else: score -= 1
 
-    # qp
-    if qp >= 0.7:
-        score += 2
-    elif qp >= 0.5:
-        score += 1
-    else:
-        score -= 1
+    if 0.3 <= qn <= 0.7: score += 2
+    elif 0.2 <= qn < 0.3 or 0.7 < qn <= 0.8: score += 1
+    else: score -= 1
 
-    # qN
-    if 0.3 <= qn <= 0.7:
-        score += 2
-    elif 0.2 <= qn < 0.3 or 0.7 < qn <= 0.8:
-        score += 1
-    else:
-        score -= 1
-
-    # Interpretazione
     if score >= 10:
         return "🌿 Healthy – Optimal physiological state"
     elif 6 <= score < 10:
@@ -90,101 +119,82 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     else:
         return "⚠️ High stress – Likely physiological damage"
 
-# Funzione rule-based per tipo di stress con log di trigger e suggerimenti
+# Predizione del tipo di stress
 def predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn):
     triggers = []
     suggestion = ""
 
     if fvfm < 0.75 and chl_tot < 1.0 and spad < 30:
         triggers.append("Low Fv/Fm, Chl TOT and SPAD suggest Nutrient Deficiency")
-        suggestion = "Consider fertilizing with nitrogen-rich nutrients and monitor chlorophyll content."
+        suggestion = "Consider fertilizing with nitrogen-rich nutrients."
         return "Nutrient Deficiency", triggers, suggestion
     elif fvfm < 0.75 and qp < 0.5 and qn > 0.7:
         triggers.append("Low Fv/Fm and qp with high qN suggest Excess Light Stress")
-        suggestion = "Reduce light intensity or duration; consider partial shading during peak sunlight."
+        suggestion = "Reduce light intensity and exposure duration."
         return "Excess Light Stress", triggers, suggestion
     elif fvfm < 0.75 and car_tot < 0.3 and spad < 30:
         triggers.append("Low Fv/Fm, CAR TOT and SPAD suggest Drought Stress")
-        suggestion = "Increase irrigation frequency and ensure consistent soil moisture levels."
+        suggestion = "Increase irrigation frequency."
         return "Drought Stress", triggers, suggestion
     elif fvfm < 0.7 and chl_tot < 1.0 and car_tot < 0.3:
         triggers.append("Low Fv/Fm, Chl TOT and CAR TOT suggest Cold Stress")
-        suggestion = "Protect plant from low temperatures; consider temporary heating or insulation."
+        suggestion = "Protect from low temperatures."
         return "Cold Stress", triggers, suggestion
     else:
-        triggers.append("No rules triggered based on input thresholds")
-        suggestion = "No specific corrective action identified; continue monitoring."
+        triggers.append("No rules triggered.")
+        suggestion = "Continue monitoring."
         return "No specific stress pattern detected", triggers, suggestion
 
-# Funzione per visualizzare i risultati in un riquadro colorato
-def show_result_card(result, stress_type, suggestion):
-    if "Healthy" in result:
-        color = "#388e3c"
-        emoji = "🌿"
-    elif "Moderate" in result:
-        color = "#fbc02d"
-        emoji = "🌱"
-    else:
-        color = "#d32f2f"
-        emoji = "⚠️"
-
-    st.markdown(f'''
-    <div style="background-color:{color}; padding:20px; border-radius:10px; color:white;">
-        <h3 style="margin-bottom:0;">{emoji} {result}</h3>
-        <p style="font-size:16px;"><b>🔎 Stress Type:</b> {stress_type}</p>
-        <p style="font-size:16px;"><b>💡 Suggestion:</b> {suggestion}</p>
-    </div>
-    ''', unsafe_allow_html=True)
-
-# Titolo principale con firma
+# Titolo
 st.markdown("""
     <h1 style='text-align: center;'>🌿 Plant Health Checker</h1>
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
-    <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
+    <p class="footer-note">Developed by Giuseppe Muscari Tomajoli ©2025</p>
 """, unsafe_allow_html=True)
 
-# Divider decorativo
-st.markdown("<hr style='border: 1px solid #ccc;'>", unsafe_allow_html=True)
+# Sezione sample info
+with st.container():
+    st.markdown("<div class='section-box'>", unsafe_allow_html=True)
+    st.markdown("<div class='section-title'>🧪 Sample Information</div>", unsafe_allow_html=True)
+    species = st.text_input("Species (e.g., Arabidopsis thaliana)")
+    sample_name = st.text_input("Sample name or ID")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# Input: specie e nome campione
-st.markdown("""
-    <h3>🧪 Sample Information</h3>
-""", unsafe_allow_html=True)
+# Sezione parametri fisiologici
+with st.container():
+    st.markdown("<div class='section-box'>", unsafe_allow_html=True)
+    st.markdown("<div class='section-title'>📊 Physiological Parameters</div>", unsafe_allow_html=True)
+    col1, col2 = st.columns(2)
 
-species = st.text_input("🔬 Species (e.g., Arabidopsis thaliana)")
-sample_name = st.text_input("🖊️ Sample name or ID")
+    with col1:
+        fvfm = st.number_input("🌿 Fv/Fm", min_value=0.0, max_value=1.0, step=0.01)
+        chl_tot = st.number_input("🌿 Chlorophyll Total (Chl TOT)", min_value=0.0, step=0.1)
+        spad = st.number_input("🔴 SPAD Value", min_value=0.0, step=0.1)
 
-st.markdown("<hr style='border: 1px solid #ccc;'>", unsafe_allow_html=True)
+    with col2:
+        car_tot = st.number_input("🍑 Carotenoids Total (CAR TOT)", min_value=0.0, step=0.1)
+        qp = st.number_input("💡 qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
+        qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# Input dei parametri con layout a due colonne
-st.markdown("""
-    <h3>📊 Physiological Parameters</h3>
-""", unsafe_allow_html=True)
-
-col1, col2 = st.columns(2)
-
-with col1:
-    fvfm = st.number_input("🍃 Fv/Fm", min_value=0.0, max_value=1.0, step=0.01)
-    chl_tot = st.number_input("🌿 Chlorophyll Total (Chl TOT)", min_value=0.0, step=0.1)
-    spad = st.number_input("🔴 SPAD Value", min_value=0.0, step=0.1)
-
-with col2:
-    car_tot = st.number_input("🍊 Carotenoids Total (CAR TOT)", min_value=0.0, step=0.1)
-    qp = st.number_input("💡 qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
-    qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
-
-# Valutazione al click del pulsante
+# Valutazione
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
     stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
 
-    show_result_card(result, stress_type, suggestion)
+    st.markdown(f"""
+        <div class='section-box'>
+            <h4>{result}</h4>
+            <p><b>Stress Type:</b> {stress_type}</p>
+            <p><b>Suggestion:</b> {suggestion}</p>
+        </div>
+    """, unsafe_allow_html=True)
 
     with st.expander("📋 Stress Rule Triggers"):
         for t in triggers:
             st.markdown(f"- {t}")
 
-    # Salvataggio dei dati in CSV
+    # Salva su CSV
     data = {
         "timestamp": [datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
         "Species": [species],
@@ -200,34 +210,23 @@ if st.button("🔍 Evaluate Health"):
         "Suggestion": [suggestion]
     }
     df = pd.DataFrame(data)
-
     if not os.path.exists("results.csv"):
         df.to_csv("results.csv", index=False)
     else:
         df.to_csv("results.csv", mode='a', header=False, index=False)
+    st.success("✅ Data saved to results.csv")
 
-    st.info("Data saved to results.csv")
-
-# Visualizza tabella dei risultati salvati, se presente
+# Risultati salvati
 if os.path.exists("results.csv"):
     st.subheader("🗂️ Recorded Evaluations")
-
-    # Pulsante per resettare i dati
     if st.button("♻️ Reset Table"):
         os.remove("results.csv")
-        st.warning("All recorded evaluations have been deleted.")
+        st.warning("All evaluations deleted.")
     else:
         try:
             saved_df = pd.read_csv("results.csv")
             st.dataframe(saved_df)
-
-            # Pulsante per scaricare il file
             csv = saved_df.to_csv(index=False).encode('utf-8')
-            st.download_button(
-                label="💾 Download Results (CSV)",
-                data=csv,
-                file_name='results.csv',
-                mime='text/csv',
-            )
+            st.download_button("💾 Download Results (CSV)", data=csv, file_name='results.csv', mime='text/csv')
         except pd.errors.ParserError:
             st.error("⚠️ The results file is corrupted. Please reset the table.")
