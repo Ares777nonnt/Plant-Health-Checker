@@ -31,6 +31,19 @@ class _PlantFormState extends State<PlantForm> {
   double qp = 0.6;
   double qn = 0.4;
 
+  void _resetForm() {
+    setState(() {
+      species = '';
+      sampleName = '';
+      fvfm = 0.75;
+      spad = 30.0;
+      chlTot = 1.5;
+      carTot = 1.0;
+      qp = 0.6;
+      qn = 0.4;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,6 +58,13 @@ class _PlantFormState extends State<PlantForm> {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            tooltip: 'Reset form',
+            onPressed: _resetForm,
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
