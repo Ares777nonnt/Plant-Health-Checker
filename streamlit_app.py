@@ -90,6 +90,20 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     else:
         return "⚠️ High stress – Likely physiological damage"
 
+# Funzione rule-based per tipo di stress
+
+def predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn):
+    if fvfm < 0.75 and chl_tot < 1.0 and spad < 30:
+        return "Nutrient Deficiency"
+    elif fvfm < 0.75 and qp < 0.5 and qn > 0.7:
+        return "Excess Light Stress"
+    elif fvfm < 0.75 and car_tot < 0.3 and spad < 30:
+        return "Drought Stress"
+    elif fvfm < 0.7 and chl_tot < 1.0 and car_tot < 0.3:
+        return "Cold Stress"
+    else:
+        return "No specific stress pattern detected"
+
 # Titolo principale
 st.markdown("""
     <h1 style='text-align: center;'>🌿 Plant Health Checker</h1>
@@ -116,6 +130,7 @@ with col2:
 # Valutazione al click del pulsante
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
+    stress_type = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
 
     if "Healthy" in result:
         st.success(result)
@@ -123,6 +138,8 @@ if st.button("🔍 Evaluate Health"):
         st.warning(result)
     else:
         st.error(result)
+
+    st.markdown(f"<h4>🩸 Predicted Stress Type: <i>{stress_type}</i></h4>", unsafe_allow_html=True)
 
     # Salvataggio dei dati in CSV
     data = {
@@ -135,7 +152,8 @@ if st.button("🔍 Evaluate Health"):
         "SPAD": [spad],
         "qp": [qp],
         "qN": [qn],
-        "Health Status": [result]
+        "Health Status": [result],
+        "Stress Type": [stress_type]
     }
     df = pd.DataFrame(data)
 
