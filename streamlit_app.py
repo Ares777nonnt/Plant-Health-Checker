@@ -96,6 +96,10 @@ st.markdown("""
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
 """, unsafe_allow_html=True)
 
+# Input: specie e nome campione
+species = st.text_input("Species (e.g., Arabidopsis thaliana)")
+sample_name = st.text_input("Sample name or ID")
+
 # Input dei parametri con layout a due colonne
 col1, col2 = st.columns(2)
 
@@ -123,6 +127,8 @@ if st.button("🔍 Evaluate Health"):
     # Salvataggio dei dati in CSV
     data = {
         "timestamp": [datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
+        "Species": [species],
+        "Sample Name": [sample_name],
         "Fv/Fm": [fvfm],
         "Chl TOT": [chl_tot],
         "CAR TOT": [car_tot],
@@ -145,14 +151,6 @@ if os.path.exists("results.csv"):
     st.subheader("📅 Recorded Evaluations")
     saved_df = pd.read_csv("results.csv")
     st.dataframe(saved_df)
-
-    # Grafici temporali dei parametri
-    st.subheader("🌿 Trends Over Time")
-    selected_param = st.selectbox("Select parameter to visualize:", ["Fv/Fm", "Chl TOT", "CAR TOT", "SPAD", "qp", "qN"])
-    chart_df = saved_df[["timestamp", selected_param]]
-    chart_df["timestamp"] = pd.to_datetime(chart_df["timestamp"])
-    chart_df = chart_df.sort_values("timestamp")
-    st.line_chart(chart_df.set_index("timestamp"))
 
     # Pulsante per scaricare il file
     csv = saved_df.to_csv(index=False).encode('utf-8')
