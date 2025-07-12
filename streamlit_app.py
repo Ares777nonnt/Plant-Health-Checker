@@ -131,7 +131,7 @@ def show_result_card(result, stress_type, suggestion):
     st.markdown(f'''
     <div style="background-color:{color}; padding:20px; border-radius:10px; color:white;">
         <h3 style="margin-bottom:0;">{emoji} {result}</h3>
-        <p style="font-size:16px;"><b>🦨 Stress Type:</b> {stress_type}</p>
+        <p style="font-size:16px;"><b>🔎 Stress Type:</b> {stress_type}</p>
         <p style="font-size:16px;"><b>💡 Suggestion:</b> {suggestion}</p>
     </div>
     ''', unsafe_allow_html=True)
