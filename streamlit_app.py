@@ -1,7 +1,27 @@
 import streamlit as st
+import pandas as pd
+import os
+from datetime import datetime
 
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
+
+# CSS per sfondo animato
+st.markdown("""
+    <style>
+    .stApp {
+        background: linear-gradient(-45deg, #e0f7fa, #a5d6a7, #fce4ec, #ffccbc);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # Funzione per valutare la salute della pianta
 def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
@@ -85,9 +105,31 @@ with col2:
 # Valutazione al click del pulsante
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
+
     if "Healthy" in result:
         st.success(result)
     elif "Moderate" in result:
         st.warning(result)
     else:
         st.error(result)
+
+    # Salvataggio dei dati in CSV
+    data = {
+        "timestamp": [datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
+        "Fv/Fm": [fvfm],
+        "Chl TOT": [chl_tot],
+        "CAR TOT": [car_tot],
+        "SPAD": [spad],
+        "qp": [qp],
+        "qN": [qn],
+        "Health Status": [result]
+    }
+    df = pd.DataFrame(data)
+
+    if not os.path.exists("results.csv"):
+        df.to_csv("results.csv", index=False)
+    else:
+        df.to_csv("results.csv", mode='a', header=False, index=False)
+
+    st.info("Data saved to results.csv")
+
