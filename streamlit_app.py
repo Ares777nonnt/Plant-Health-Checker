@@ -6,18 +6,16 @@ from datetime import datetime
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
 
-# CSS con gradiente animato dai toni tenui
+# CSS con immagine di sfondo sfocata e parallasse
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(-45deg, #e8f5e9, #f1f8e9, #e0f2f1, #fce4ec);
-        background-size: 400% 400%;
-        animation: gradientBG 15s ease infinite;
-    }
-    @keyframes gradientBG {
-        0% {background-position: 0% 50%;}
-        50% {background-position: 100% 50%;}
-        100% {background-position: 0% 50%;}
+        background-image: url("https://raw.githubusercontent.com/Ares777nonnt/blank-app/main/3390191.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        backdrop-filter: blur(3px);
     }
     </style>
 """, unsafe_allow_html=True)
