@@ -90,26 +90,32 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     else:
         return "⚠️ High stress – Likely physiological damage"
 
-# Funzione rule-based per tipo di stress con log di trigger
+# Funzione rule-based per tipo di stress con log di trigger e suggerimenti
 
 def predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn):
     triggers = []
+    suggestion = ""
 
     if fvfm < 0.75 and chl_tot < 1.0 and spad < 30:
         triggers.append("Low Fv/Fm, Chl TOT and SPAD suggest Nutrient Deficiency")
-        return "Nutrient Deficiency", triggers
+        suggestion = "Consider fertilizing with nitrogen-rich nutrients and monitor chlorophyll content."
+        return "Nutrient Deficiency", triggers, suggestion
     elif fvfm < 0.75 and qp < 0.5 and qn > 0.7:
         triggers.append("Low Fv/Fm and qp with high qN suggest Excess Light Stress")
-        return "Excess Light Stress", triggers
+        suggestion = "Reduce light intensity or duration; consider partial shading during peak sunlight."
+        return "Excess Light Stress", triggers, suggestion
     elif fvfm < 0.75 and car_tot < 0.3 and spad < 30:
         triggers.append("Low Fv/Fm, CAR TOT and SPAD suggest Drought Stress")
-        return "Drought Stress", triggers
+        suggestion = "Increase irrigation frequency and ensure consistent soil moisture levels."
+        return "Drought Stress", triggers, suggestion
     elif fvfm < 0.7 and chl_tot < 1.0 and car_tot < 0.3:
         triggers.append("Low Fv/Fm, Chl TOT and CAR TOT suggest Cold Stress")
-        return "Cold Stress", triggers
+        suggestion = "Protect plant from low temperatures; consider temporary heating or insulation."
+        return "Cold Stress", triggers, suggestion
     else:
         triggers.append("No rules triggered based on input thresholds")
-        return "No specific stress pattern detected", triggers
+        suggestion = "No specific corrective action identified; continue monitoring."
+        return "No specific stress pattern detected", triggers, suggestion
 
 # Titolo principale
 st.markdown("""
@@ -137,7 +143,7 @@ with col2:
 # Valutazione al click del pulsante
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
-    stress_type, triggers = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
+    stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
 
     if "Healthy" in result:
         st.success(result)
@@ -152,6 +158,8 @@ if st.button("🔍 Evaluate Health"):
         for t in triggers:
             st.markdown(f"- {t}")
 
+    st.info(f"💡 Suggestion: {suggestion}")
+
     # Salvataggio dei dati in CSV
     data = {
         "timestamp": [datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
@@ -164,7 +172,8 @@ if st.button("🔍 Evaluate Health"):
         "qp": [qp],
         "qN": [qn],
         "Health Status": [result],
-        "Stress Type": [stress_type]
+        "Stress Type": [stress_type],
+        "Suggestion": [suggestion]
     }
     df = pd.DataFrame(data)
 
