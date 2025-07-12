@@ -1,6 +1,9 @@
 import streamlit as st
 
-# Funzione di valutazione
+# Imposta il layout e il titolo della pagina
+st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
+
+# Funzione per valutare la salute della pianta
 def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     score = 0
 
@@ -60,19 +63,31 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     else:
         return "⚠️ High stress – Likely physiological damage"
 
-# UI Streamlit
-st.set_page_config(page_title="Plant Health Checker", layout="centered")
-st.title("🌿 Plant Health Checker")
-st.markdown("Enter the physiological parameters of your plant to assess its health status.")
+# Titolo principale con emoji e stile HTML
+st.markdown("""
+    <h1 style='text-align: center; color: #4CAF50;'>🌿 Plant Health Checker</h1>
+    <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
+    """, unsafe_allow_html=True)
 
-# Input
-fvfm = st.number_input("Fv/Fm", min_value=0.0, max_value=1.0, step=0.01)
-chl_tot = st.number_input("Chlorophyll Total (Chl TOT)", min_value=0.0, step=0.1)
-car_tot = st.number_input("Carotenoids Total (CAR TOT)", min_value=0.0, step=0.1)
-spad = st.number_input("SPAD Value", min_value=0.0, step=0.1)
-qp = st.number_input("qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
-qn = st.number_input("qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
+# Input dei parametri con layout a due colonne
+col1, col2 = st.columns(2)
 
+with col1:
+    fvfm = st.number_input("Fv/Fm", min_value=0.0, max_value=1.0, step=0.01)
+    chl_tot = st.number_input("Chlorophyll Total (Chl TOT)", min_value=0.0, step=0.1)
+    spad = st.number_input("SPAD Value", min_value=0.0, step=0.1)
+
+with col2:
+    car_tot = st.number_input("Carotenoids Total (CAR TOT)", min_value=0.0, step=0.1)
+    qp = st.number_input("qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
+    qn = st.number_input("qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
+
+# Valutazione al click del pulsante
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
-    st.success(result)
+    if "Healthy" in result:
+        st.success(result)
+    elif "Moderate" in result:
+        st.warning(result)
+    else:
+        st.error(result)
