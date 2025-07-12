@@ -21,14 +21,6 @@ st.markdown("""
         color: white;
     }
 
-    .box {
-        background-color: rgba(255, 255, 255, 0.05);
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        border: 1px solid #ccc;
-    }
-
     .section-title {
         font-size: 24px;
         margin-bottom: 10px;
@@ -148,17 +140,12 @@ st.markdown("""
     <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
 """, unsafe_allow_html=True)
 
-# Sezione Sample Information
-st.markdown("<hr class='divider'>", unsafe_allow_html=True)
-st.markdown("<div class='box'>", unsafe_allow_html=True)
+# Sample Information
 st.markdown("<div class='section-title'>🧪 Sample Information</div>", unsafe_allow_html=True)
 species = st.text_input("Species (e.g., Arabidopsis thaliana)")
 sample_name = st.text_input("Sample name or ID")
-st.markdown("</div>", unsafe_allow_html=True)
-st.markdown("<hr class='divider'>", unsafe_allow_html=True)
 
-# Sezione Physiological Parameters
-st.markdown("<div class='box'>", unsafe_allow_html=True)
+# Physiological Parameters
 st.markdown("<div class='section-title'>📊 Physiological Parameters</div>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 with col1:
@@ -169,9 +156,8 @@ with col2:
     car_tot = st.number_input("🍊 Carotenoids Total (CAR TOT)", min_value=0.0, step=0.1)
     qp = st.number_input("💡 qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
     qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
-st.markdown("</div>", unsafe_allow_html=True)
 
-# Valutazione
+# Evaluation
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
     stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
@@ -200,7 +186,7 @@ if st.button("🔍 Evaluate Health"):
         df.to_csv("results.csv", mode='a', header=False, index=False)
     st.info("Data saved to results.csv")
 
-# Tabella risultati
+# Saved Results
 if os.path.exists("results.csv"):
     st.subheader("🗂️ Recorded Evaluations")
     if st.button("♻️ Reset Table"):
