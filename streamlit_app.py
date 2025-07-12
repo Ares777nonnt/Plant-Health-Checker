@@ -6,15 +6,14 @@ from datetime import datetime
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
 
-# CSS con pattern a foglie chiare
+# CSS con GIF animata dai toni verdi tenui
 st.markdown("""
     <style>
     .stApp {
-        background-image: url("https://www.transparenttextures.com/patterns/green-fibers.png");
-        background-size: auto;
-        background-repeat: repeat;
+        background-image: url("https://i.gifer.com/Yk8j.gif");
+        background-size: cover;
+        background-repeat: no-repeat;
         background-attachment: fixed;
-        background-color: #f5fff5;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -128,3 +127,26 @@ if st.button("🔍 Evaluate Health"):
         df.to_csv("results.csv", mode='a', header=False, index=False)
 
     st.info("Data saved to results.csv")
+
+# Visualizza tabella dei risultati salvati, se presente
+if os.path.exists("results.csv"):
+    st.subheader("📅 Recorded Evaluations")
+    saved_df = pd.read_csv("results.csv")
+    st.dataframe(saved_df)
+
+    # Grafici temporali dei parametri
+    st.subheader("🌿 Trends Over Time")
+    selected_param = st.selectbox("Select parameter to visualize:", ["Fv/Fm", "Chl TOT", "CAR TOT", "SPAD", "qp", "qN"])
+    chart_df = saved_df[["timestamp", selected_param]]
+    chart_df["timestamp"] = pd.to_datetime(chart_df["timestamp"])
+    chart_df = chart_df.sort_values("timestamp")
+    st.line_chart(chart_df.set_index("timestamp"))
+
+    # Pulsante per scaricare il file
+    csv = saved_df.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="📥 Download Results as CSV",
+        data=csv,
+        file_name='results.csv',
+        mime='text/csv',
+    )
