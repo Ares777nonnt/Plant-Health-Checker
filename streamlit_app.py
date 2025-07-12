@@ -91,7 +91,6 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
         return "⚠️ High stress – Likely physiological damage"
 
 # Funzione rule-based per tipo di stress con log di trigger e suggerimenti
-
 def predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn):
     triggers = []
     suggestion = ""
@@ -116,6 +115,26 @@ def predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn):
         triggers.append("No rules triggered based on input thresholds")
         suggestion = "No specific corrective action identified; continue monitoring."
         return "No specific stress pattern detected", triggers, suggestion
+
+# Funzione per visualizzare i risultati in un riquadro colorato
+def show_result_card(result, stress_type, suggestion):
+    if "Healthy" in result:
+        color = "#388e3c"
+        emoji = "🌿"
+    elif "Moderate" in result:
+        color = "#fbc02d"
+        emoji = "🌱"
+    else:
+        color = "#d32f2f"
+        emoji = "⚠️"
+
+    st.markdown(f'''
+    <div style="background-color:{color}; padding:20px; border-radius:10px; color:white;">
+        <h3 style="margin-bottom:0;">{emoji} {result}</h3>
+        <p style="font-size:16px;"><b>🦨 Stress Type:</b> {stress_type}</p>
+        <p style="font-size:16px;"><b>💡 Suggestion:</b> {suggestion}</p>
+    </div>
+    ''', unsafe_allow_html=True)
 
 # Titolo principale con firma
 st.markdown("""
@@ -146,20 +165,11 @@ if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
     stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
 
-    if "Healthy" in result:
-        st.success(result)
-    elif "Moderate" in result:
-        st.warning(result)
-    else:
-        st.error(result)
-
-    st.markdown(f"<h4>🦨 Predicted Stress Type: <i>{stress_type}</i></h4>", unsafe_allow_html=True)
+    show_result_card(result, stress_type, suggestion)
 
     with st.expander("View stress rule triggers"):
         for t in triggers:
             st.markdown(f"- {t}")
-
-    st.info(f"💡 Suggestion: {suggestion}")
 
     # Salvataggio dei dati in CSV
     data = {
