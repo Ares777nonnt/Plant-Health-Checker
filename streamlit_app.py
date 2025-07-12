@@ -6,7 +6,7 @@ from datetime import datetime
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
 
-# CSS con gradiente "Forest Fog" – sfumato, profondo, elegante
+# CSS con gradiente "Forest Twilight" – scuro, elegante, con contrasto
 st.markdown("""
     <style>
     html, body, [class*="css"]  {
@@ -17,7 +17,7 @@ st.markdown("""
     }
 
     .stApp {
-        background: linear-gradient(120deg, #d0f0c0, #b2dfdb, #e0f7fa);
+        background: linear-gradient(135deg, #263238, #2e7d32, #004d40);
         background-size: 400% 400%;
         animation: gradientBG 30s ease infinite;
     }
@@ -92,7 +92,7 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
 
 # Titolo principale
 st.markdown("""
-    <h1 style='text-align: center; color: #4CAF50;'>🌿 Plant Health Checker</h1>
+    <h1 style='text-align: center;'>🌿 Plant Health Checker</h1>
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
 """, unsafe_allow_html=True)
 
