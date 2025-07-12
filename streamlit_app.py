@@ -6,7 +6,7 @@ from datetime import datetime
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
 
-# CSS con gradiente animato "Verdant Flow"
+# CSS con gradiente "Forest Fog" – sfumato, profondo, elegante
 st.markdown("""
     <style>
     html, body, [class*="css"]  {
@@ -17,9 +17,9 @@ st.markdown("""
     }
 
     .stApp {
-        background: linear-gradient(-45deg, #e0f7fa, #c8e6c9, #f1f8e9, #b2dfdb);
+        background: linear-gradient(120deg, #d0f0c0, #b2dfdb, #e0f7fa);
         background-size: 400% 400%;
-        animation: gradientBG 20s ease infinite;
+        animation: gradientBG 30s ease infinite;
     }
 
     @keyframes gradientBG {
