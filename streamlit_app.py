@@ -27,6 +27,14 @@ st.markdown("""
         50% {background-position: 100% 50%;}
         100% {background-position: 0% 50%;}
     }
+
+    .card {
+        background-color: rgba(255,255,255,0.1);
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.2);
+        margin-bottom: 20px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -34,7 +42,6 @@ st.markdown("""
 def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     score = 0
 
-    # Fv/Fm
     if fvfm >= 0.80:
         score += 2
     elif fvfm >= 0.75:
@@ -42,7 +49,6 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     else:
         score -= 1
 
-    # Chl TOT
     if chl_tot >= 1.5:
         score += 2
     elif chl_tot >= 1.0:
@@ -50,7 +56,6 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     else:
         score -= 1
 
-    # CAR TOT
     if car_tot >= 0.5:
         score += 2
     elif car_tot >= 0.3:
@@ -58,7 +63,6 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     else:
         score -= 1
 
-    # SPAD
     if spad >= 40:
         score += 2
     elif spad >= 30:
@@ -66,7 +70,6 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     else:
         score -= 1
 
-    # qp
     if qp >= 0.7:
         score += 2
     elif qp >= 0.5:
@@ -74,7 +77,6 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     else:
         score -= 1
 
-    # qN
     if 0.3 <= qn <= 0.7:
         score += 2
     elif 0.2 <= qn < 0.3 or 0.7 < qn <= 0.8:
@@ -82,7 +84,6 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     else:
         score -= 1
 
-    # Interpretazione
     if score >= 10:
         return "🌿 Healthy – Optimal physiological state"
     elif 6 <= score < 10:
@@ -136,42 +137,50 @@ def show_result_card(result, stress_type, suggestion):
     </div>
     ''', unsafe_allow_html=True)
 
-# Titolo principale con firma
+# Header
 st.markdown("""
     <h1 style='text-align: center;'>🌿 Plant Health Checker</h1>
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
     <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
 """, unsafe_allow_html=True)
 
-# Input: specie e nome campione
-species = st.text_input("Species (e.g., Arabidopsis thaliana)")
-sample_name = st.text_input("Sample name or ID")
+# Input: specie e nome campione in card
+with st.container():
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.markdown("### 🌱 Sample Information")
+    species = st.text_input("🔬 Species (e.g., Arabidopsis thaliana)")
+    sample_name = st.text_input("🧪 Sample name or ID")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# Input dei parametri con layout a due colonne
-col1, col2 = st.columns(2)
+# Input fisiologici in card
+with st.container():
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.markdown("### 📊 Physiological Parameters")
+    col1, col2 = st.columns(2)
 
-with col1:
-    fvfm = st.number_input("Fv/Fm", min_value=0.0, max_value=1.0, step=0.01)
-    chl_tot = st.number_input("Chlorophyll Total (Chl TOT)", min_value=0.0, step=0.1)
-    spad = st.number_input("SPAD Value", min_value=0.0, step=0.1)
+    with col1:
+        fvfm = st.number_input("🌿 Fv/Fm", min_value=0.0, max_value=1.0, step=0.01)
+        chl_tot = st.number_input("🌱 Chlorophyll Total (Chl TOT)", min_value=0.0, step=0.1)
+        spad = st.number_input("🌡️ SPAD Value", min_value=0.0, step=0.1)
 
-with col2:
-    car_tot = st.number_input("Carotenoids Total (CAR TOT)", min_value=0.0, step=0.1)
-    qp = st.number_input("qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
-    qn = st.number_input("qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
+    with col2:
+        car_tot = st.number_input("🍊 Carotenoids Total (CAR TOT)", min_value=0.0, step=0.1)
+        qp = st.number_input("💡 qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
+        qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# Valutazione al click del pulsante
+# Pulsante valutazione
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
     stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
 
     show_result_card(result, stress_type, suggestion)
 
-    with st.expander("View stress rule triggers"):
+    with st.expander("📋 Stress Rule Triggers"):
         for t in triggers:
             st.markdown(f"- {t}")
 
-    # Salvataggio dei dati in CSV
+    # Salvataggio
     data = {
         "timestamp": [datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
         "Species": [species],
@@ -195,23 +204,19 @@ if st.button("🔍 Evaluate Health"):
 
     st.info("Data saved to results.csv")
 
-# Visualizza tabella dei risultati salvati, se presente
+# Visualizza tabella
 if os.path.exists("results.csv"):
-    st.subheader("🗕 Recorded Evaluations")
-
-    # Pulsante per resettare i dati
-    if st.button("Reset Table"):
+    st.subheader("🗂️ Recorded Evaluations")
+    if st.button("♻️ Reset Table"):
         os.remove("results.csv")
         st.warning("All recorded evaluations have been deleted.")
     else:
         try:
             saved_df = pd.read_csv("results.csv")
             st.dataframe(saved_df)
-
-            # Pulsante per scaricare il file
             csv = saved_df.to_csv(index=False).encode('utf-8')
             st.download_button(
-                label="📅 Download Results as CSV",
+                label="💾 Download Results (CSV)",
                 data=csv,
                 file_name='results.csv',
                 mime='text/csv',
