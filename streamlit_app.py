@@ -6,14 +6,22 @@ from datetime import datetime
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
 
-# CSS con sfondo animato "Verdant Flow" (gradienti verdi-azzurri tenui)
+# CSS con gradiente animato "Verdant Flow"
 st.markdown("""
     <style>
+    html, body, [class*="css"]  {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: 'sans-serif';
+    }
+
     .stApp {
         background: linear-gradient(-45deg, #e0f7fa, #c8e6c9, #f1f8e9, #b2dfdb);
         background-size: 400% 400%;
         animation: gradientBG 20s ease infinite;
     }
+
     @keyframes gradientBG {
         0% {background-position: 0% 50%;}
         50% {background-position: 100% 50%;}
@@ -82,11 +90,11 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     else:
         return "⚠️ High stress – Likely physiological damage"
 
-# Titolo principale con emoji e stile HTML
+# Titolo principale
 st.markdown("""
     <h1 style='text-align: center; color: #4CAF50;'>🌿 Plant Health Checker</h1>
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
-    """, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # Input dei parametri con layout a due colonne
 col1, col2 = st.columns(2)
