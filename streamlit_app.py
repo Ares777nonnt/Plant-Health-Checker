@@ -1,146 +1,70 @@
-import 'package:flutter/material.dart';
+import streamlit as st
+import pandas as pd
+from datetime import datetime
 
-void main() {
-  runApp(PlantHealthApp());
-}
+# Funzione di valutazione dello stress vegetale basata su soglie
+@st.cache_data
+def evaluate_plant_health(fvfm, spad, chl_tot, car_tot, qp, qn):
+    if fvfm < 0.6 or spad < 20 or chl_tot < 1.0 or car_tot < 1.0 or qp < 0.4 or qn > 0.6:
+        return "❌ High Stress", "Reduce light intensity and check nutrient availability."
+    elif fvfm < 0.75 or spad < 30 or chl_tot < 2.0 or car_tot < 2.0 or qp < 0.6 or qn > 0.5:
+        return "⚠️ Moderate Stress", "Monitor environmental conditions closely."
+    else:
+        return "✅ Healthy", "Keep current cultivation conditions."
 
-class PlantHealthApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Plant Health',
-      theme: ThemeData.dark(),
-      home: PlantForm(),
-    );
-  }
-}
+# Titolo e firma
+st.title("🌿 Plant Health Evaluation")
+st.markdown("<h5 style='text-align: right; color: gray;'>Developed by Giuseppe Muscari Tomajoli ©2025</h5>", unsafe_allow_html=True)
 
-class PlantForm extends StatefulWidget {
-  @override
-  _PlantFormState createState() => _PlantFormState();
-}
+# Input utente
+st.subheader("📥 Insert Sample Data")
+species = st.text_input("Species")
+sample_name = st.text_input("Sample Name")
+fvfm = st.slider("Fv/Fm", 0.0, 1.0, 0.75)
+chl_tot = st.slider("Chl TOT", 0.0, 5.0, 1.5)
+car_tot = st.slider("CAR TOT", 0.0, 5.0, 1.0)
+spad = st.slider("SPAD", 0.0, 60.0, 30.0)
+qp = st.slider("qp", 0.0, 1.0, 0.6)
+qn = st.slider("qN", 0.0, 1.0, 0.4)
 
-class _PlantFormState extends State<PlantForm> {
-  final _formKey = GlobalKey<FormState>();
-  String species = '';
-  String sampleName = '';
-  double fvfm = 0.75;
-  double spad = 30.0;
-  double chlTot = 1.5;
-  double carTot = 1.0;
-  double qp = 0.6;
-  double qn = 0.4;
+# Valutazione
+if st.button("Evaluate"):
+    status, advice = evaluate_plant_health(fvfm, spad, chl_tot, car_tot, qp, qn)
+    st.subheader("🧪 Evaluation Result")
+    st.success(f"Status: {status}")
+    st.info(f"Advice: {advice}")
 
-  void _resetForm() {
-    setState(() {
-      species = '';
-      sampleName = '';
-      fvfm = 0.75;
-      spad = 30.0;
-      chlTot = 1.5;
-      carTot = 1.0;
-      qp = 0.6;
-      qn = 0.4;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('🌿 Plant Health Mobile'),
-            Text(
-              'Developed by Giuseppe Muscari Tomajoli ©2025',
-              style: TextStyle(fontSize: 12, color: Colors.grey[400]),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh),
-            tooltip: 'Reset form',
-            onPressed: _resetForm,
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Species'),
-                onChanged: (val) => species = val,
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Sample Name'),
-                onChanged: (val) => sampleName = val,
-              ),
-              SizedBox(height: 20),
-              _buildSlider('Fv/Fm', fvfm, 0.0, 1.0, (val) => setState(() => fvfm = val)),
-              _buildSlider('SPAD', spad, 0.0, 60.0, (val) => setState(() => spad = val)),
-              _buildSlider('Chl TOT', chlTot, 0.0, 5.0, (val) => setState(() => chlTot = val)),
-              _buildSlider('CAR TOT', carTot, 0.0, 5.0, (val) => setState(() => carTot = val)),
-              _buildSlider('qp', qp, 0.0, 1.0, (val) => setState(() => qp = val)),
-              _buildSlider('qN', qn, 0.0, 1.0, (val) => setState(() => qn = val)),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  String health = _evaluateHealth(fvfm, spad, chlTot, carTot, qp, qn);
-                  showDialog(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      title: Text('📋 Results'),
-                      content: Text(
-                        'Species: $species\n'
-                        'Sample: $sampleName\n'
-                        'Fv/Fm: ${fvfm.toStringAsFixed(2)}\n'
-                        'SPAD: ${spad.toStringAsFixed(1)}\n'
-                        'Chl TOT: ${chlTot.toStringAsFixed(1)}\n'
-                        'CAR TOT: ${carTot.toStringAsFixed(1)}\n'
-                        'qp: ${qp.toStringAsFixed(2)}\n'
-                        'qN: ${qn.toStringAsFixed(2)}\n\n'
-                        '🧬 Health Status: $health',
-                      ),
-                    ),
-                  );
-                },
-                child: Text('Evaluate Health'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSlider(String label, double value, double min, double max, ValueChanged<double> onChanged) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('$label: ${value.toStringAsFixed(2)}'),
-        Slider(
-          value: value,
-          min: min,
-          max: max,
-          divisions: 100,
-          onChanged: onChanged,
-        ),
-      ],
-    );
-  }
-
-  String _evaluateHealth(double fvfm, double spad, double chlTot, double carTot, double qp, double qn) {
-    if (fvfm < 0.6 || spad < 20 || chlTot < 1.0 || carTot < 1.0 || qp < 0.4 || qn > 0.6) {
-      return '❌ High Stress';
-    } else if (fvfm < 0.75 || spad < 30 || chlTot < 2.0 || carTot < 2.0 || qp < 0.6 || qn > 0.5) {
-      return '⚠️ Moderate Stress';
-    } else {
-      return '✅ Healthy';
+    result = {
+        "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "Species": species,
+        "Sample": sample_name,
+        "FvFm": fvfm,
+        "SPAD": spad,
+        "ChlTOT": chl_tot,
+        "CARTOT": car_tot,
+        "qp": qp,
+        "qN": qn,
+        "Status": status,
+        "Advice": advice
     }
-  }
-}
+
+    try:
+        existing_df = pd.read_csv("results.csv")
+        df = pd.concat([existing_df, pd.DataFrame([result])], ignore_index=True)
+    except:
+        df = pd.DataFrame([result])
+
+    df.to_csv("results.csv", index=False)
+
+# Visualizzazione dati salvati
+st.markdown("---")
+st.subheader("📅 Recorded Evaluations")
+try:
+    saved_df = pd.read_csv("results.csv")
+    st.dataframe(saved_df)
+    if st.button("🔁 Reset Table"):
+        saved_df = pd.DataFrame()
+        saved_df.to_csv("results.csv", index=False)
+        st.experimental_rerun()
+except:
+    st.info("No saved data yet.")
