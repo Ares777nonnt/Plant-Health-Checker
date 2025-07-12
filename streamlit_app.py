@@ -193,14 +193,17 @@ if os.path.exists("results.csv"):
         os.remove("results.csv")
         st.warning("All recorded evaluations have been deleted.")
     else:
-        saved_df = pd.read_csv("results.csv")
-        st.dataframe(saved_df)
+        try:
+            saved_df = pd.read_csv("results.csv")
+            st.dataframe(saved_df)
 
-        # Pulsante per scaricare il file
-        csv = saved_df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="📥 Download Results as CSV",
-            data=csv,
-            file_name='results.csv',
-            mime='text/csv',
-        )
+            # Pulsante per scaricare il file
+            csv = saved_df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="📥 Download Results as CSV",
+                data=csv,
+                file_name='results.csv',
+                mime='text/csv',
+            )
+        except pd.errors.ParserError:
+            st.error("⚠️ The results file is corrupted. Please reset the table.")
