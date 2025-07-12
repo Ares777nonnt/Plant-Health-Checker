@@ -6,14 +6,18 @@ from datetime import datetime
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
 
-# CSS con GIF animata dai toni verdi tenui
+# CSS con gradiente animato dai toni tenui
 st.markdown("""
     <style>
     .stApp {
-        background-image: url("https://i.gifer.com/Yk8j.gif");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
+        background: linear-gradient(-45deg, #e8f5e9, #f1f8e9, #e0f2f1, #fce4ec);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+    }
+    @keyframes gradientBG {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
     }
     </style>
 """, unsafe_allow_html=True)
