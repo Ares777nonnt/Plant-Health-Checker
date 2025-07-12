@@ -149,14 +149,20 @@ if st.button("🔍 Evaluate Health"):
 # Visualizza tabella dei risultati salvati, se presente
 if os.path.exists("results.csv"):
     st.subheader("📅 Recorded Evaluations")
-    saved_df = pd.read_csv("results.csv")
-    st.dataframe(saved_df)
 
-    # Pulsante per scaricare il file
-    csv = saved_df.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        label="📥 Download Results as CSV",
-        data=csv,
-        file_name='results.csv',
-        mime='text/csv',
-    )
+    # Pulsante per resettare i dati
+    if st.button("Reset Table"):
+        os.remove("results.csv")
+        st.warning("All recorded evaluations have been deleted.")
+    else:
+        saved_df = pd.read_csv("results.csv")
+        st.dataframe(saved_df)
+
+        # Pulsante per scaricare il file
+        csv = saved_df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Download Results as CSV",
+            data=csv,
+            file_name='results.csv',
+            mime='text/csv',
+        )
