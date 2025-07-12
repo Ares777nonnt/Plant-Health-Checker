@@ -90,19 +90,26 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     else:
         return "⚠️ High stress – Likely physiological damage"
 
-# Funzione rule-based per tipo di stress
+# Funzione rule-based per tipo di stress con log di trigger
 
 def predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn):
+    triggers = []
+
     if fvfm < 0.75 and chl_tot < 1.0 and spad < 30:
-        return "Nutrient Deficiency"
+        triggers.append("Low Fv/Fm, Chl TOT and SPAD suggest Nutrient Deficiency")
+        return "Nutrient Deficiency", triggers
     elif fvfm < 0.75 and qp < 0.5 and qn > 0.7:
-        return "Excess Light Stress"
+        triggers.append("Low Fv/Fm and qp with high qN suggest Excess Light Stress")
+        return "Excess Light Stress", triggers
     elif fvfm < 0.75 and car_tot < 0.3 and spad < 30:
-        return "Drought Stress"
+        triggers.append("Low Fv/Fm, CAR TOT and SPAD suggest Drought Stress")
+        return "Drought Stress", triggers
     elif fvfm < 0.7 and chl_tot < 1.0 and car_tot < 0.3:
-        return "Cold Stress"
+        triggers.append("Low Fv/Fm, Chl TOT and CAR TOT suggest Cold Stress")
+        return "Cold Stress", triggers
     else:
-        return "No specific stress pattern detected"
+        triggers.append("No rules triggered based on input thresholds")
+        return "No specific stress pattern detected", triggers
 
 # Titolo principale
 st.markdown("""
@@ -130,7 +137,7 @@ with col2:
 # Valutazione al click del pulsante
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
-    stress_type = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
+    stress_type, triggers = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
 
     if "Healthy" in result:
         st.success(result)
@@ -140,6 +147,10 @@ if st.button("🔍 Evaluate Health"):
         st.error(result)
 
     st.markdown(f"<h4>🩸 Predicted Stress Type: <i>{stress_type}</i></h4>", unsafe_allow_html=True)
+
+    with st.expander("View stress rule triggers"):
+        for t in triggers:
+            st.markdown(f"- {t}")
 
     # Salvataggio dei dati in CSV
     data = {
