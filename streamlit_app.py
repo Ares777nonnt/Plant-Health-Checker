@@ -117,10 +117,11 @@ def predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn):
         suggestion = "No specific corrective action identified; continue monitoring."
         return "No specific stress pattern detected", triggers, suggestion
 
-# Titolo principale
+# Titolo principale con firma
 st.markdown("""
     <h1 style='text-align: center;'>🌿 Plant Health Checker</h1>
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
+    <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
 """, unsafe_allow_html=True)
 
 # Input: specie e nome campione
@@ -152,7 +153,7 @@ if st.button("🔍 Evaluate Health"):
     else:
         st.error(result)
 
-    st.markdown(f"<h4>🩸 Predicted Stress Type: <i>{stress_type}</i></h4>", unsafe_allow_html=True)
+    st.markdown(f"<h4>🦨 Predicted Stress Type: <i>{stress_type}</i></h4>", unsafe_allow_html=True)
 
     with st.expander("View stress rule triggers"):
         for t in triggers:
@@ -186,7 +187,7 @@ if st.button("🔍 Evaluate Health"):
 
 # Visualizza tabella dei risultati salvati, se presente
 if os.path.exists("results.csv"):
-    st.subheader("📅 Recorded Evaluations")
+    st.subheader("🗕 Recorded Evaluations")
 
     # Pulsante per resettare i dati
     if st.button("Reset Table"):
@@ -200,7 +201,7 @@ if os.path.exists("results.csv"):
             # Pulsante per scaricare il file
             csv = saved_df.to_csv(index=False).encode('utf-8')
             st.download_button(
-                label="📥 Download Results as CSV",
+                label="📅 Download Results as CSV",
                 data=csv,
                 file_name='results.csv',
                 mime='text/csv',
