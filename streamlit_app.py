@@ -6,19 +6,15 @@ from datetime import datetime
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
 
-# CSS per sfondo animato
+# CSS con pattern a foglie chiare
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(-45deg, #e0f7fa, #a5d6a7, #fce4ec, #ffccbc);
-        background-size: 400% 400%;
-        animation: gradientBG 15s ease infinite;
-    }
-
-    @keyframes gradientBG {
-        0% {background-position: 0% 50%;}
-        50% {background-position: 100% 50%;}
-        100% {background-position: 0% 50%;}
+        background-image: url("https://www.transparenttextures.com/patterns/green-fibers.png");
+        background-size: auto;
+        background-repeat: repeat;
+        background-attachment: fixed;
+        background-color: #f5fff5;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -132,4 +128,3 @@ if st.button("🔍 Evaluate Health"):
         df.to_csv("results.csv", mode='a', header=False, index=False)
 
     st.info("Data saved to results.csv")
-
