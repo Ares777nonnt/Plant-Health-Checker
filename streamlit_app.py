@@ -134,7 +134,11 @@ def show_result_card(result, stress_type, suggestion):
     ''', unsafe_allow_html=True)
 
 # Logo + Header
-st.image("logo.png", width=120)
+st.markdown("""
+    <div style='text-align: center;'>
+        <img src='data:image/png;base64,""" + st.image("logo.png", output_format="png", use_column_width=False).image_to_url("logo.png") + """' alt='logo' width='120'/>
+    </div>
+""", unsafe_allow_html=True)
 
 st.markdown("""
     <h1 style='text-align: center;'>Plant Health Checker</h1>
@@ -207,3 +211,4 @@ if os.path.exists("results.csv"):
             )
         except pd.errors.ParserError:
             st.error("⚠️ The results file is corrupted. Please reset the table.")
+
