@@ -1,13 +1,13 @@
-
 import streamlit as st
 import pandas as pd
 import os
 from datetime import datetime
+import base64
 
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
 
-# CSS con stile professionale e sfondo #002220
+# CSS con stile professionale
 st.markdown("""
     <style>
     html, body, [class*="css"]  {
@@ -15,8 +15,6 @@ st.markdown("""
         margin: 0;
         padding: 0;
         font-family: 'Segoe UI', sans-serif;
-        background-color: #002220;
-        color: white;
     }
 
     .stApp {
@@ -136,9 +134,15 @@ def show_result_card(result, stress_type, suggestion):
     </div>
     ''', unsafe_allow_html=True)
 
-# Header
-st.markdown("""
-    <h1 style='text-align: center;'>🌿 Plant Health Checker</h1>
+# Logo + Header
+with open("logo.png", "rb") as f:
+    data = base64.b64encode(f.read()).decode("utf-8")
+
+st.markdown(f"""
+    <div style='display: flex; justify-content: center; align-items: center;'>
+        <img src='data:image/png;base64,{data}' width='50' style='margin-right:10px;'/>
+        <h1 style='display:inline; margin:0;'>Plant Health Checker</h1>
+    </div>
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
     <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
 """, unsafe_allow_html=True)
