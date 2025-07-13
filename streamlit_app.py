@@ -35,12 +35,6 @@ st.markdown("""
         background: linear-gradient(to right, #4caf50, #81c784, #a5d6a7);
         margin: 30px 0;
     }
-    .auth-box {
-        padding: 20px;
-        border-radius: 10px;
-        margin-top: 20px;
-        background-color: transparent;
-    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -58,34 +52,7 @@ authenticator = stauth.Authenticate(
     config['credentials'], 'plant_health_app', 'abcdef', cookie_expiry_days=1
 )
 
-# ---------- Sidebar: Accesso utente ----------
-st.sidebar.header("🔐 User Access")
-registration = st.sidebar.checkbox("Register New User")
-
-with st.sidebar.container():
-    with st.container():
-        if registration:
-            st.markdown("<div class='auth-box'>", unsafe_allow_html=True)
-            st.subheader("🆕 Create New Account")
-            new_name = st.text_input("👤 Full Name")
-            new_username = st.text_input("🆔 Username")
-            new_password = st.text_input("🔑 Password", type="password")
-
-            if st.button("✅ Register"):
-                if new_username in config['credentials']['usernames']:
-                    st.warning("⚠️ Username already exists.")
-                else:
-                    hashed_pw = stauth.Hasher([new_password]).generate()[0]
-                    config['credentials']['usernames'][new_username] = {
-                        'name': new_name,
-                        'password': hashed_pw
-                    }
-                    with open(users_file, 'w') as file:
-                        yaml.dump(config, file)
-                    st.success("✅ User registered! You can now log in.")
-                    st.experimental_rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
-
+# ---------- Login ----------
 name, authentication_status, username = authenticator.login("🔑 Login", location="sidebar")
 
 if authentication_status:
