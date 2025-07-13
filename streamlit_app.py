@@ -43,7 +43,7 @@ st.markdown("""
         }
         .header-container img {
             margin-bottom: 10px;
-            width: 220px !important;
+            width: 300px !important;
         }
     }
     </style>
