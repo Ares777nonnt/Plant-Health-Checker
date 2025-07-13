@@ -246,3 +246,12 @@ if os.path.exists("results.csv"):
             )
         except pd.errors.ParserError:
             st.error("⚠️ The results file is corrupted. Please reset the table.")
+
+# Contact and Information Section
+st.markdown("""
+<hr class='divider'>
+<h4 style='color:white;'>📬 Contact & Information</h4>
+<p style='color:white;'>For inquiries, suggestions, or collaborations, please reach out to: <a style='color:#90caf9;' href='mailto:giuseppemuscari.gm@gmail.com'>giuseppemuscari.gm@gmail.com</a></p>
+<p style='color:white;'>App developed by Giuseppe Muscari Tomajoli – passionate about astrobiology and plant resilience research.</p>
+<hr class='divider'>
+""", unsafe_allow_html=True)
