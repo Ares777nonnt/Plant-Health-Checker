@@ -78,7 +78,7 @@ if registration:
             st.experimental_rerun()
 
 # ---------- Login ----------
-name, authentication_status, username = authenticator.login("Login", "sidebar")
+name, authentication_status, username = authenticator.login("Login", location="sidebar")
 
 if authentication_status:
     authenticator.logout('Logout', 'sidebar')
@@ -218,7 +218,7 @@ if authentication_status:
 
     # ---------- STORICO ----------
     if os.path.exists("results.csv"):
-        st.subheader("📂 Your Recorded Evaluations")
+        st.subheader("🗂️ Your Recorded Evaluations")
 
         if st.button("♻️ Reset Table"):
             os.remove("results.csv")
