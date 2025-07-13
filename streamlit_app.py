@@ -36,11 +36,10 @@ st.markdown("""
         margin: 30px 0;
     }
     .auth-box {
-        background-color: rgba(255,255,255,0.07);
         padding: 20px;
         border-radius: 10px;
         margin-top: 20px;
-        border: 1px solid #81c784;
+        background-color: transparent;
     }
     </style>
 """, unsafe_allow_html=True)
