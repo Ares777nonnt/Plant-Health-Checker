@@ -43,7 +43,7 @@ st.markdown("""
         }
         .header-container img {
             margin-bottom: 10px;
-            width: 300px !important;
+            width: 220px !important;
         }
     }
     </style>
@@ -152,7 +152,7 @@ with open("logo.png", "rb") as f:
 
 st.markdown(f"""
     <div class='header-container' style='display: flex; justify-content: center; align-items: center;'>
-        <img src='data:image/png;base64,{data}' width='300' style='margin-right:10px;' class='header-logo'/>
+        <img src='data:image/png;base64,{data}' width='130' style='margin-right:10px;' class='header-logo'/>
         <h1 style='margin:0;'>Plant Health Checker</h1>
     </div>
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
@@ -224,3 +224,13 @@ if os.path.exists("results.csv"):
             )
         except pd.errors.ParserError:
             st.error("⚠️ The results file is corrupted. Please reset the table.")
+
+# Contact Section
+st.markdown("<hr class='divider'>", unsafe_allow_html=True)
+st.markdown("<div class='section-title'>📬 Contact & About</div>", unsafe_allow_html=True)
+st.markdown("""
+**Developer:** Giuseppe Muscari Tomajoli  
+**Email:** giuseppemuscari.gm@gmail.com  
+**Affiliation:** University of Naples Federico II  
+**About this App:** This application is designed to evaluate plant physiological health and stress levels using measurable indicators. For research and educational purposes.
+""")
