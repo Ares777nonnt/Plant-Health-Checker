@@ -7,7 +7,7 @@ import base64
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
 
-# CSS con stile professionale
+# CSS con stile professionale + responsivo
 st.markdown("""
     <style>
     html, body, [class*="css"]  {
@@ -33,6 +33,16 @@ st.markdown("""
         border: none;
         border-top: 2px dashed #bdbdbd;
         margin: 30px 0;
+    }
+
+    @media (max-width: 768px) {
+        .header-container {
+            flex-direction: column !important;
+            text-align: center;
+        }
+        .header-container img {
+            margin-bottom: 10px;
+        }
     }
     </style>
 """, unsafe_allow_html=True)
@@ -139,9 +149,9 @@ with open("logo.png", "rb") as f:
     data = base64.b64encode(f.read()).decode("utf-8")
 
 st.markdown(f"""
-    <div style='display: flex; justify-content: center; align-items: center;'>
-        <img src='data:image/png;base64,{data}' width='200' style='margin-right:10px;'/>
-        <h1 style='display:inline; margin:0;'>Plant Health Checker</h1>
+    <div class='header-container' style='display: flex; justify-content: center; align-items: center;'>
+        <img src='data:image/png;base64,{data}' width='70' style='margin-right:10px;' />
+        <h1 style='margin:0;'>Plant Health Checker</h1>
     </div>
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
     <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
