@@ -6,7 +6,7 @@ from datetime import datetime
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
 
-# CSS con stile professionale
+# CSS con stile professionale e sfondo #002220
 st.markdown("""
     <style>
     html, body, [class*="css"]  {
@@ -14,10 +14,12 @@ st.markdown("""
         margin: 0;
         padding: 0;
         font-family: 'Segoe UI', sans-serif;
+        background-color: #002220;
+        color: white;
     }
 
     .stApp {
-        background: linear-gradient(to bottom, #002220, #2e7d32);
+        background-color: #002220;
         color: white;
     }
 
@@ -35,16 +37,6 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
-
-# Chiedi all'utente un ID univoco (es. nome o e-mail abbreviata)
-user_id = st.text_input("🔑 Enter your User ID (e.g. your initials or email prefix):")
-if not user_id:
-    st.warning("Please enter your User ID to proceed.")
-    st.stop()
-
-# Crea una cartella personale per l'utente
-user_dir = os.path.join("user_data", user_id)
-os.makedirs(user_dir, exist_ok=True)
 
 # Funzione per valutare la salute della pianta
 def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
@@ -190,29 +182,28 @@ if st.button("🔍 Evaluate Health"):
         "Suggestion": [suggestion]
     }
     df = pd.DataFrame(data)
-    csv_path = os.path.join(user_dir, "results.csv")
-    if not os.path.exists(csv_path):
-        df.to_csv(csv_path, index=False)
+    if not os.path.exists("results.csv"):
+        df.to_csv("results.csv", index=False)
     else:
-        df.to_csv(csv_path, mode='a', header=False, index=False)
-    st.info("Data saved to your personal results.csv")
+        df.to_csv("results.csv", mode='a', header=False, index=False)
+    st.info("Data saved to results.csv")
 
 # Saved Results
-if os.path.exists(os.path.join(user_dir, "results.csv")):
-    st.subheader("🗂️ Your Recorded Evaluations")
-    if st.button("♻️ Reset My Table"):
-        os.remove(os.path.join(user_dir, "results.csv"))
-        st.warning("Your evaluations have been deleted.")
+if os.path.exists("results.csv"):
+    st.subheader("🗂️ Recorded Evaluations")
+    if st.button("♻️ Reset Table"):
+        os.remove("results.csv")
+        st.warning("All recorded evaluations have been deleted.")
     else:
         try:
-            saved_df = pd.read_csv(os.path.join(user_dir, "results.csv"))
+            saved_df = pd.read_csv("results.csv")
             st.dataframe(saved_df)
             csv = saved_df.to_csv(index=False).encode('utf-8')
             st.download_button(
-                label="💾 Download My Results (CSV)",
+                label="💾 Download Results (CSV)",
                 data=csv,
                 file_name='results.csv',
                 mime='text/csv',
             )
         except pd.errors.ParserError:
-            st.error("⚠️ Your results file is corrupted. Please reset your table.")
+            st.error("⚠️ The results file is corrupted. Please reset the table.")
