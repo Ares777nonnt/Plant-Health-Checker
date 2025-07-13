@@ -42,6 +42,7 @@ st.markdown("""
         }
         .header-container img {
             margin-bottom: 10px;
+            width: 120px !important;
         }
     }
     </style>
@@ -150,7 +151,7 @@ with open("logo.png", "rb") as f:
 
 st.markdown(f"""
     <div class='header-container' style='display: flex; justify-content: center; align-items: center;'>
-        <img src='data:image/png;base64,{data}' width='70' style='margin-right:10px;' />
+        <img src='data:image/png;base64,{data}' width='70' style='margin-right:10px;' class='header-logo'/>
         <h1 style='margin:0;'>Plant Health Checker</h1>
     </div>
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
