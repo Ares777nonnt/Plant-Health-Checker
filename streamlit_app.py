@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import os
@@ -6,7 +7,7 @@ from datetime import datetime
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
 
-# CSS con stile professionale
+# CSS con stile professionale e sfondo #002220
 st.markdown("""
     <style>
     html, body, [class*="css"]  {
@@ -14,6 +15,8 @@ st.markdown("""
         margin: 0;
         padding: 0;
         font-family: 'Segoe UI', sans-serif;
+        background-color: #002220;
+        color: white;
     }
 
     .stApp {
@@ -133,15 +136,9 @@ def show_result_card(result, stress_type, suggestion):
     </div>
     ''', unsafe_allow_html=True)
 
-# Logo + Header
+# Header
 st.markdown("""
-    <div style='text-align: center;'>
-        <img src='data:image/png;base64,""" + st.image("logo.png", output_format="png", use_column_width=False).image_to_url("logo.png") + """' alt='logo' width='120'/>
-    </div>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-    <h1 style='text-align: center;'>Plant Health Checker</h1>
+    <h1 style='text-align: center;'>🌿 Plant Health Checker</h1>
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
     <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
 """, unsafe_allow_html=True)
@@ -211,4 +208,3 @@ if os.path.exists("results.csv"):
             )
         except pd.errors.ParserError:
             st.error("⚠️ The results file is corrupted. Please reset the table.")
-
