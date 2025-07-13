@@ -78,7 +78,7 @@ if registration:
             st.experimental_rerun()
 
 # ---------- Login ----------
-name, authentication_status, username = authenticator.login("Login", "main")
+name, authentication_status, username = authenticator.login("Login", location="sidebar")
 
 if authentication_status:
     authenticator.logout('Logout', 'sidebar')
