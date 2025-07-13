@@ -101,7 +101,31 @@ if authentication_status:
 
     st.markdown("<hr>", unsafe_allow_html=True)
 
-    # [Resto del codice invariato per elaborazione dati e salvataggio...]
+    # ---------- Directory utente personale ----------
+    user_dir = os.path.join("user_data", username)
+    os.makedirs(user_dir, exist_ok=True)
+    st.info(f"📁 You are working in your personal space: `{user_dir}`")
+
+    # ---------- ESEMPIO DI SALVATAGGIO ----------
+    sample_id = st.text_input("🔍 Sample ID")
+    value = st.number_input("Enter a plant measurement value:")
+
+    if st.button("💾 Save Result") and sample_id:
+        df = pd.DataFrame({"Sample ID": [sample_id], "Value": [value]})
+        save_path = os.path.join(user_dir, f"{sample_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv")
+        df.to_csv(save_path, index=False)
+        st.success(f"✅ File saved as `{os.path.basename(save_path)}`")
+
+    # ---------- VISIONE FILE SALVATI ----------
+    st.markdown("### 📂 Your Saved Analyses")
+    files = os.listdir(user_dir)
+    if files:
+        selected_file = st.selectbox("Choose a file to view:", files)
+        if selected_file:
+            df_loaded = pd.read_csv(os.path.join(user_dir, selected_file))
+            st.dataframe(df_loaded)
+    else:
+        st.info("You haven't saved any analysis yet.")
 
 elif authentication_status == False:
     st.error('Username/password is incorrect')
