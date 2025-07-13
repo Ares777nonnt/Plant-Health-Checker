@@ -152,7 +152,7 @@ with open("logo.png", "rb") as f:
 
 st.markdown(f"""
     <div class='header-container' style='display: flex; justify-content: center; align-items: center;'>
-        <img src='data:image/png;base64,{data}' width='150' style='margin-right:10px;' class='header-logo'/>
+        <img src='data:image/png;base64,{data}' width='220' style='margin-right:10px;' class='header-logo'/>
         <h1 style='margin:0;'>Plant Health Checker</h1>
     </div>
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
