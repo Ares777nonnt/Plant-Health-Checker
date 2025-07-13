@@ -105,27 +105,49 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
 def predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn):
     triggers = []
     suggestion = ""
+    confidence = "Low"
 
     if fvfm < 0.75 and chl_tot < 1.0 and spad < 30:
         triggers.append("Low Fv/Fm, Chl TOT and SPAD suggest Nutrient Deficiency")
         suggestion = "Consider fertilizing with nitrogen-rich nutrients and monitor chlorophyll content."
-        return "Nutrient Deficiency", triggers, suggestion
+        return "Nutrient Deficiency (confidence: medium)", triggers, suggestion
     elif fvfm < 0.75 and qp < 0.5 and qn > 0.7:
         triggers.append("Low Fv/Fm and qp with high qN suggest Excess Light Stress")
         suggestion = "Reduce light intensity or duration; consider partial shading during peak sunlight."
-        return "Excess Light Stress", triggers, suggestion
+        return "Excess Light Stress (confidence: medium)", triggers, suggestion
     elif fvfm < 0.75 and car_tot < 0.3 and spad < 30:
         triggers.append("Low Fv/Fm, CAR TOT and SPAD suggest Drought Stress")
         suggestion = "Increase irrigation frequency and ensure consistent soil moisture levels."
-        return "Drought Stress", triggers, suggestion
+        return "Drought Stress (confidence: medium)", triggers, suggestion
     elif fvfm < 0.7 and chl_tot < 1.0 and car_tot < 0.3:
         triggers.append("Low Fv/Fm, Chl TOT and CAR TOT suggest Cold Stress")
         suggestion = "Protect plant from low temperatures; consider temporary heating or insulation."
-        return "Cold Stress", triggers, suggestion
+        return "Cold Stress (confidence: medium)", triggers, suggestion
+    elif fvfm < 0.75 and qn > 0.7 and chl_tot < 1.0:
+        triggers.append("High qN, low Fv/Fm and Chl TOT suggest Heat Stress")
+        suggestion = "Ensure adequate ventilation and shading; avoid peak heat exposure."
+        return "Heat Stress (confidence: low)", triggers, suggestion
+    elif fvfm < 0.75 and qp < 0.5 and chl_tot < 1.0:
+        triggers.append("Low Fv/Fm, qp and Chl TOT suggest Salinity Stress")
+        suggestion = "Check salinity levels in the soil and use salt-tolerant cultivars."
+        return "Salinity Stress (confidence: low)", triggers, suggestion
+    elif fvfm < 0.7 and chl_tot < 1.0 and qp < 0.5:
+        triggers.append("Low Fv/Fm, qp and Chl TOT suggest Heavy Metal Stress")
+        suggestion = "Consider phytoremediation or reduce metal exposure in the environment."
+        return "Heavy Metal Stress (confidence: low)", triggers, suggestion
+    elif qp < 0.4 and fvfm < 0.75:
+        triggers.append("Low qp and Fv/Fm may indicate Pathogen or Biotic Stress")
+        suggestion = "Inspect for pest/pathogen presence and apply biocontrol if needed."
+        return "Biotic Stress (confidence: low)", triggers, suggestion
+    elif fvfm < 0.75 and qn > 0.7 and car_tot < 0.3:
+        triggers.append("Low Fv/Fm, CAR TOT and high qN may indicate Ozone Stress")
+        suggestion = "Minimize exposure to air pollutants and monitor for oxidative damage."
+        return "Ozone Stress (confidence: low)", triggers, suggestion
     else:
         triggers.append("No rules triggered based on input thresholds")
         suggestion = "No specific corrective action identified; continue monitoring."
         return "No specific stress pattern detected", triggers, suggestion
+
 
 def show_result_card(result, stress_type, suggestion):
     if "Healthy" in result:
@@ -152,7 +174,7 @@ with open("logo.png", "rb") as f:
 
 st.markdown(f"""
     <div class='header-container' style='display: flex; justify-content: center; align-items: center;'>
-        <img src='data:image/png;base64,{data}' width='200' style='margin-right:10px;' class='header-logo'/>
+        <img src='data:image/png;base64,{data}' width='300' style='margin-right:10px;' class='header-logo'/>
         <h1 style='margin:0;'>Plant Health Checker</h1>
     </div>
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
@@ -224,13 +246,3 @@ if os.path.exists("results.csv"):
             )
         except pd.errors.ParserError:
             st.error("⚠️ The results file is corrupted. Please reset the table.")
-
-# Contact Section
-st.markdown("<hr class='divider'>", unsafe_allow_html=True)
-st.markdown("<div class='section-title'>📬 Contact & About</div>", unsafe_allow_html=True)
-st.markdown("""
-**Developer:** Giuseppe Muscari Tomajoli  
-**Email:** giuseppemuscari.gm@gmail.com  
-**Affiliation:** University of Naples Federico II  
-**About this App:** This application is designed to evaluate plant physiological health and stress levels using measurable indicators. For research and educational purposes.
-""")
