@@ -20,6 +20,7 @@ st.markdown("""
     .stApp {
         background-color: #002220;
         color: white;
+        padding-bottom: 80px;
     }
 
     .section-title {
@@ -42,7 +43,7 @@ st.markdown("""
         }
         .header-container img {
             margin-bottom: 10px;
-            width: 120px !important;
+            width: 180px !important;
         }
     }
     </style>
