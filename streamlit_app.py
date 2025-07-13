@@ -20,7 +20,7 @@ st.markdown("""
     .stApp {
         background-color: #002220;
         color: white;
-        padding-bottom: 80px;
+        padding-bottom: 120px;
     }
 
     .section-title {
@@ -43,7 +43,7 @@ st.markdown("""
         }
         .header-container img {
             margin-bottom: 10px;
-            width: 180px !important;
+            width: 200px !important;
         }
     }
     </style>
@@ -152,7 +152,7 @@ with open("logo.png", "rb") as f:
 
 st.markdown(f"""
     <div class='header-container' style='display: flex; justify-content: center; align-items: center;'>
-        <img src='data:image/png;base64,{data}' width='70' style='margin-right:10px;' class='header-logo'/>
+        <img src='data:image/png;base64,{data}' width='90' style='margin-right:10px;' class='header-logo'/>
         <h1 style='margin:0;'>Plant Health Checker</h1>
     </div>
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
