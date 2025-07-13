@@ -1,10 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
-import yaml
-import streamlit_authenticator as stauth
 from datetime import datetime
-from yaml.loader import SafeLoader
 
 # ---------- Configurazione iniziale ----------
 
@@ -38,63 +35,37 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ---------- Autenticazione ----------
-users_file = "users.yaml"
+# ---------- HEADER ----------
+st.markdown("""
+    <h1 style='text-align: center;'>🌿 Plant Health Checker</h1>
+    <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
+    <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
+""", unsafe_allow_html=True)
 
-if not os.path.exists(users_file):
-    with open(users_file, 'w') as f:
-        yaml.dump({'credentials': {'usernames': {}}}, f)
+st.markdown("<hr>", unsafe_allow_html=True)
 
-with open(users_file, 'r') as file:
-    config = yaml.load(file, Loader=SafeLoader)
+# ---------- USER DIRECTORY (NO LOGIN) ----------
+user_dir = os.path.join("user_data", "default_user")
+os.makedirs(user_dir, exist_ok=True)
+st.info(f"📁 You are working in your personal space: `{user_dir}`")
 
-authenticator = stauth.Authenticate(
-    config['credentials'], 'plant_health_app', 'abcdef', cookie_expiry_days=1
-)
+# ---------- ESEMPIO DI SALVATAGGIO ----------
+sample_id = st.text_input("🔍 Sample ID")
+value = st.number_input("Enter a plant measurement value:")
 
-# ---------- Login ----------
-name, authentication_status, username = authenticator.login("🔑 Login", location="sidebar")
+if st.button("💾 Save Result") and sample_id:
+    df = pd.DataFrame({"Sample ID": [sample_id], "Value": [value]})
+    save_path = os.path.join(user_dir, f"{sample_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv")
+    df.to_csv(save_path, index=False)
+    st.success(f"✅ File saved as `{os.path.basename(save_path)}`")
 
-if authentication_status:
-    authenticator.logout('🚪 Logout', 'sidebar')
-    st.sidebar.success(f"🔓 Logged in as {name}")
-
-    # ---------- HEADER ----------
-    st.markdown("""
-        <h1 style='text-align: center;'>🌿 Plant Health Checker</h1>
-        <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
-        <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
-    """, unsafe_allow_html=True)
-
-    st.markdown("<hr>", unsafe_allow_html=True)
-
-    # ---------- Directory utente personale ----------
-    user_dir = os.path.join("user_data", username)
-    os.makedirs(user_dir, exist_ok=True)
-    st.info(f"📁 You are working in your personal space: `{user_dir}`")
-
-    # ---------- ESEMPIO DI SALVATAGGIO ----------
-    sample_id = st.text_input("🔍 Sample ID")
-    value = st.number_input("Enter a plant measurement value:")
-
-    if st.button("💾 Save Result") and sample_id:
-        df = pd.DataFrame({"Sample ID": [sample_id], "Value": [value]})
-        save_path = os.path.join(user_dir, f"{sample_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv")
-        df.to_csv(save_path, index=False)
-        st.success(f"✅ File saved as `{os.path.basename(save_path)}`")
-
-    # ---------- VISIONE FILE SALVATI ----------
-    st.markdown("### 📂 Your Saved Analyses")
-    files = os.listdir(user_dir)
-    if files:
-        selected_file = st.selectbox("Choose a file to view:", files)
-        if selected_file:
-            df_loaded = pd.read_csv(os.path.join(user_dir, selected_file))
-            st.dataframe(df_loaded)
-    else:
-        st.info("You haven't saved any analysis yet.")
-
-elif authentication_status == False:
-    st.error('Username/password is incorrect')
-elif authentication_status == None:
-    st.warning('Please enter your username and password')
+# ---------- VISIONE FILE SALVATI ----------
+st.markdown("### 📂 Your Saved Analyses")
+files = os.listdir(user_dir)
+if files:
+    selected_file = st.selectbox("Choose a file to view:", files)
+    if selected_file:
+        df_loaded = pd.read_csv(os.path.join(user_dir, selected_file))
+        st.dataframe(df_loaded)
+else:
+    st.info("You haven't saved any analysis yet.")
