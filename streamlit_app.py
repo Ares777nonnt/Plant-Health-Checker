@@ -308,7 +308,7 @@ if st.button("🔍 Evaluate Health"):
             "Chl TOT": 413
         }
 
-        st.markdown("<div class='section-title'>📊 Comparison with TRY Database</div>", unsafe_allow_html=True)
+        st.markdown("<br><div class='section-title'>📊 Comparison with TRY Database</div>", unsafe_allow_html=True)
         for label, trait_id in trait_map.items():
             mean_val = means.get(trait_id, None)
             if mean_val is not None and not pd.isna(mean_val):
@@ -320,7 +320,7 @@ if st.button("🔍 Evaluate Health"):
 
 # Tabella risultati
 if st.session_state.results:
-    st.markdown("<div class='section-title'>📁 Sampled Records</div>", unsafe_allow_html=True)
+    st.markdown("<br><div class='section-title'>📁 Sampled Records</div>", unsafe_allow_html=True)
     result_df = pd.DataFrame(st.session_state.results)
     st.dataframe(result_df, use_container_width=True)
 
