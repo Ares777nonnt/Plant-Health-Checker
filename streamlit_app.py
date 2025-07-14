@@ -266,8 +266,8 @@ if st.session_state.results:
     )
 
     if st.button("🗑️ Reset All Records"):
-        st.session_state.results = []
-        st.experimental_rerun()
+        st.session_state.results.clear()
+        st.success("Records have been cleared. You may manually rerun the app if needed.")
 
 # Footer contatti
 st.markdown("""
