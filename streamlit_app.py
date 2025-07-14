@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from datetime import datetime
 import base64
+import io
 
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
@@ -168,21 +169,6 @@ if st.button("🔍 Evaluate Health"):
         for t in triggers:
             st.markdown(f"- {t}")
 
-    matched_species = next((s for s in species_list if s.lower() == species.lower()), None)
-    if matched_species:
-        subset = try_df[try_df["AccSpeciesName"] == matched_species]
-        means = subset.groupby("TraitID")["StdValue"].mean()
-        trait_map = {"Chl TOT": 413}
-        st.markdown("<div class='section-title'>📊 Comparison with TRY Database</div>", unsafe_allow_html=True)
-        for label, trait_id in trait_map.items():
-            mean_val = means.get(trait_id, None)
-            if mean_val is not None and not pd.isna(mean_val):
-                user_val = {"Chl TOT": chl_tot}.get(label, None)
-                diff = user_val - mean_val
-                st.markdown(f"**{label}**: You = {user_val:.2f}, TRY Mean = {mean_val:.2f} → Δ = {diff:.2f}")
-            else:
-                st.markdown(f"**{label}**: No valid data available in TRY for this trait.")
-
     if "results_list" not in st.session_state:
         st.session_state.results_list = []
 
@@ -204,9 +190,15 @@ if st.button("🔍 Evaluate Health"):
     result_df = pd.DataFrame(st.session_state.results_list)
 
     st.markdown("<div class='section-title'>⬇️ Download All Results</div>", unsafe_allow_html=True)
+
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        result_df.to_excel(writer, index=False, sheet_name="Plant Results")
+    excel_data = output.getvalue()
+
     st.download_button(
         label="📥 Download All as Excel",
-        data=result_df.to_excel(index=False, engine='openpyxl'),
+        data=excel_data,
         file_name=f"plant_health_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
