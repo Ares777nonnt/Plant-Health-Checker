@@ -87,87 +87,77 @@ with col2:
     qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
 
 # Valutazione
+def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
+    score = 0
+    if fvfm >= 0.80:
+        score += 2
+    elif fvfm >= 0.75:
+        score += 1
+    else:
+        score -= 1
+
+    if chl_tot >= 1.5:
+        score += 2
+    elif chl_tot >= 1.0:
+        score += 1
+    else:
+        score -= 1
+
+    if car_tot >= 0.5:
+        score += 2
+    elif car_tot >= 0.3:
+        score += 1
+    else:
+        score -= 1
+
+    if spad >= 40:
+        score += 2
+    elif spad >= 30:
+        score += 1
+    else:
+        score -= 1
+
+    if qp >= 0.7:
+        score += 2
+    elif qp >= 0.5:
+        score += 1
+    else:
+        score -= 1
+
+    if 0.3 <= qn <= 0.7:
+        score += 2
+    elif 0.2 <= qn < 0.3 or 0.7 < qn <= 0.8:
+        score += 1
+    else:
+        score -= 1
+
+    if score >= 10:
+        return "🌿 Healthy – Optimal physiological state"
+    elif 6 <= score < 10:
+        return "🌱 Moderate stress – Monitor closely"
+    else:
+        return "⚠️ High stress – Likely physiological damage"
+
+def show_result_card(result):
+    if "Healthy" in result:
+        color = "#388e3c"
+        emoji = "🌿"
+    elif "Moderate" in result:
+        color = "#fbc02d"
+        emoji = "🌱"
+    else:
+        color = "#d32f2f"
+        emoji = "⚠️"
+
+    st.markdown(f'''
+    <div style="background-color:{color}; padding:20px; border-radius:10px; color:white;">
+        <h3 style="margin-bottom:0;">{emoji} {result}</h3>
+    </div>
+    ''', unsafe_allow_html=True)
+
 if st.button("🔍 Evaluate Health"):
-    def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
-        score = 0
-        if fvfm >= 0.80:
-            score += 2
-        elif fvfm >= 0.75:
-            score += 1
-        else:
-            score -= 1
-
-        if chl_tot >= 1.5:
-            score += 2
-        elif chl_tot >= 1.0:
-            score += 1
-        else:
-            score -= 1
-
-        if car_tot >= 0.5:
-            score += 2
-        elif car_tot >= 0.3:
-            score += 1
-        else:
-            score -= 1
-
-        if spad >= 40:
-            score += 2
-        elif spad >= 30:
-            score += 1
-        else:
-            score -= 1
-
-        if qp >= 0.7:
-            score += 2
-        elif qp >= 0.5:
-            score += 1
-        else:
-            score -= 1
-
-        if 0.3 <= qn <= 0.7:
-            score += 2
-        elif 0.2 <= qn < 0.3 or 0.7 < qn <= 0.8:
-            score += 1
-        else:
-            score -= 1
-
-        if score >= 10:
-            return "🌿 Healthy – Optimal physiological state"
-        elif 6 <= score < 10:
-            return "🌱 Moderate stress – Monitor closely"
-        else:
-            return "⚠️ High stress – Likely physiological damage"
-
-    def predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn):
-        return "TBD", [], "Suggestion TBD"
-
-    def show_result_card(result, stress_type, suggestion):
-        if "Healthy" in result:
-            color = "#388e3c"
-            emoji = "🌿"
-        elif "Moderate" in result:
-            color = "#fbc02d"
-            emoji = "🌱"
-        else:
-            color = "#d32f2f"
-            emoji = "⚠️"
-
-        st.markdown(f'''
-        <div style="background-color:{color}; padding:20px; border-radius:10px; color:white;">
-            <h3 style="margin-bottom:0;">{emoji} {result}</h3>
-            <p style="font-size:16px;"><b>🔎 Stress Type:</b> {stress_type}</p>
-            <p style="font-size:16px;"><b>💡 Suggestion:</b> {suggestion}</p>
-        </div>
-        ''', unsafe_allow_html=True)
-
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
-    stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
-    show_result_card(result, stress_type, suggestion)
-
-    with st.expander("📋 Stress Rule Triggers"):
-        for t in triggers:
-            st.markdown(f"- {t}")
+    show_result_card(result)
 
     if "results_list" not in st.session_state:
         st.session_state.results_list = []
@@ -181,9 +171,7 @@ if st.button("🔍 Evaluate Health"):
         "SPAD": spad,
         "qp": qp,
         "qN": qn,
-        "Health Result": result,
-        "Stress Type": stress_type,
-        "Suggestion": suggestion
+        "Health Result": result
     }
 
     st.session_state.results_list.append(new_entry)
@@ -192,12 +180,12 @@ if st.button("🔍 Evaluate Health"):
     st.markdown("<div class='section-title'>⬇️ Download All Results</div>", unsafe_allow_html=True)
 
     output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         result_df.to_excel(writer, index=False, sheet_name="Plant Results")
     excel_data = output.getvalue()
 
     st.download_button(
-        label="📥 Download All as Excel",
+        label="📅 Download All as Excel",
         data=excel_data,
         file_name=f"plant_health_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
