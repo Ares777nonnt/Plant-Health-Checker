@@ -179,7 +179,13 @@ if st.button("🔍 Evaluate Health"):
         for label, trait_id in trait_map.items():
             mean_val = means.get(trait_id, None)
             if mean_val is not None and not pd.isna(mean_val):
-                user_val = eval(label.lower().replace("/", "").replace(" ", "_"))
+                user_val = {
+    "Fv/Fm": fvfm,
+    "Chl TOT": chl_tot,
+    "CAR TOT": car_tot,
+    "SPAD": spad,
+    "qN": qn
+}.get(label, None)
                 diff = user_val - mean_val
                 st.markdown(f"**{label}**: You = {user_val:.2f}, TRY Mean = {mean_val:.2f} → Δ = {diff:.2f}")
             else:
