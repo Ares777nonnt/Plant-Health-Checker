@@ -345,10 +345,10 @@ footer = f"""
     <h2>📬 Contacts</h2>
     <div class="contact-icons">
         <div class="contact-icon">
-            <a href="mailto:giuseppemuscari.gm@gmail.com" target="_blank">
+            <p>
                 <img src="https://img.icons8.com/ios-filled/50/ffffff/new-post.png" alt="Email Icon"/>
                 giuseppemuscari.gm@gmail.com
-            </a>
+            </p>
         </div>
         <div class="contact-icon">
             <a href="https://www.linkedin.com/in/giuseppemuscaritomajoli" target="_blank">
