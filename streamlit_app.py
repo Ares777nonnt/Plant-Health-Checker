@@ -132,3 +132,23 @@ species = st.selectbox("Select species", matches) if matches else species_input
 
 # Sample name
 sample_name = st.text_input("Sample name or ID")
+
+# CONTINUA GUI
+st.markdown("<div class='section-title'>📊 Physiological Parameters</div>", unsafe_allow_html=True)
+col1, col2 = st.columns(2)
+with col1:
+    fvfm = st.number_input("🍃 Fv/Fm", min_value=0.0, max_value=1.0, step=0.01)
+    chl_tot = st.number_input("🌿 Chlorophyll Total (Chl TOT)", min_value=0.0, step=0.1)
+    spad = st.number_input("🔴 SPAD Value", min_value=0.0, step=0.1)
+with col2:
+    car_tot = st.number_input("🍊 Carotenoids Total (CAR TOT)", min_value=0.0, step=0.1)
+    qp = st.number_input("💡 qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
+    qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
+
+if st.button("🔍 Evaluate Health"):
+    result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
+    stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
+    show_result_card(result, stress_type, suggestion)
+    with st.expander("📋 Stress Rule Triggers"):
+        for t in triggers:
+            st.markdown(f"- {t}")
