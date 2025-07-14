@@ -124,7 +124,7 @@ with open("logo.png", "rb") as f:
     data = base64.b64encode(f.read()).decode("utf-8")
 
 st.markdown(f"""
-    <br><div class='header-container' style='display: flex; justify-content: center; align-items: center;'>
+    <div class='header-container' style='display: flex; justify-content: center; align-items: center;'>
         <img src='data:image/png;base64,{data}' width='300' style='margin-right:10px;' class='header-logo'/>
         <h1 style='margin:0;'>Plant Health Checker</h1>
     </div>
