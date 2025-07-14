@@ -212,7 +212,7 @@ if st.button("🔍 Evaluate Health"):
     matched_species = next((s for s in species_list if s.lower() == species.lower()), None)
     if matched_species:
         subset = try_df[try_df["AccSpeciesName"] == matched_species]
-        means = subset.mean(numeric_only=True)
+        means = subset.groupby("TraitID")["StdValue"].mean()
 
         trait_map = {
             "Fv/Fm": 3393,
