@@ -270,8 +270,41 @@ if st.session_state.results:
         st.session_state.results.clear()
         st.success("Records have been cleared. You may manually rerun the app if needed.")
 
-# Footer contatti
-st.markdown("""
-<hr class="divider">
-<p style='text-align: center; color: lightgray;'>For inquiries or feedback, contact <a href="mailto:giuseppemuscari.gm@gmail.com">giuseppemuscari.gm@gmail.com</a></p>
-""", unsafe_allow_html=True)
+footer = f"""
+<style>
+  .footer-container {{
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      background-color: #002220;
+      color: #cccccc;
+      text-align: center;
+      padding: 20px 0;
+      margin-top: 50px;
+  }}
+  .footer-container img {{
+      width: 40px;
+      margin-bottom: 10px;
+  }}
+  .footer-container a {{
+      color: #76c7a1;
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: bold;
+  }}
+  .footer-container a:hover {{
+      text-decoration: underline;
+  }}
+</style>
+
+<div class="footer-container">
+    <img src='data:image/png;base64,{data}' alt="Logo"/>
+    <div>
+        <a href="mailto:giuseppemuscari.gm@gmail.com">📩 Email</a> ·
+        <a href="https://www.linkedin.com/in/giuseppemuscaritomajoli" target="_blank">🔗 LinkedIn</a> ·
+        <a href="https://www.instagram.com/giuseppemuscari" target="_blank">📸 Instagram</a>
+    </div>
+    <div style="margin-top: 5px;">©2025 Giuseppe Muscari Tomajoli</div>
+</div>
+"""
+st.markdown(footer, unsafe_allow_html=True)
