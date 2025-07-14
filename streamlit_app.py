@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from datetime import datetime
 import base64
+import io
 
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
@@ -62,8 +63,11 @@ st.markdown(f"""
     <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
 """, unsafe_allow_html=True)
 
-# Funzione valutazione stress
+# Inizializza memoria per i risultati multipli
+if "results" not in st.session_state:
+    st.session_state.results = []
 
+# Funzioni principali
 def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     score = 0
     if fvfm >= 0.80:
@@ -202,10 +206,24 @@ with col2:
     qp = st.number_input("💡 qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
     qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
 
+# Valutazione
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
     stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
     show_result_card(result, stress_type, suggestion)
+
+    st.session_state.results.append({
+        "Sample Name": sample_name,
+        "Species": species,
+        "Fv/Fm": fvfm,
+        "Chl TOT": chl_tot,
+        "CAR TOT": car_tot,
+        "SPAD": spad,
+        "qp": qp,
+        "qN": qn,
+        "Status": result,
+        "Stress Type": stress_type
+    })
 
     with st.expander("📋 Stress Rule Triggers"):
         for t in triggers:
@@ -229,6 +247,17 @@ if st.button("🔍 Evaluate Health"):
                 st.markdown(f"**{label}**: You = {user_val:.2f}, TRY Mean = {mean_val:.2f} → Δ = {diff:.2f}")
             else:
                 st.markdown(f"**{label}**: No valid data available in TRY for this trait.")
+
+# Tabella risultati
+if st.session_state.results:
+    st.markdown("<div class='section-title'>📁 Sampled Records</div>", unsafe_allow_html=True)
+    result_df = pd.DataFrame(st.session_state.results)
+    st.dataframe(result_df, use_container_width=True)
+
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        result_df.to_excel(writer, index=False)
+    st.download_button("⬇️ Download Excel File", data=output.getvalue(), file_name="plant_health_results.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 # Footer contatti
 st.markdown("""
