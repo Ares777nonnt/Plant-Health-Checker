@@ -183,12 +183,11 @@ def show_result_card(result, stress_type, suggestion):
 try_df = pd.read_csv("https://raw.githubusercontent.com/Ares777nonnt/Plant-Health-Checker/main/try_subset.csv")
 species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
 
-# Species input (autocomplete + default)
-species_input = st.text_input("Species (start typing to search)", "")
-matches = [sp for sp in species_list if species_input.lower() in sp.lower()]
-species = st.selectbox("Select species", matches) if matches else species_input
+# Single auto-complete box (selectbox with filtered options)
+species_query = st.text_input("🌱 Enter species name", "")
+matches = [s for s in species_list if species_query.lower() in s.lower()]
+species = st.selectbox("Select matching species", matches) if matches else species_query
 
-# Sample name
 sample_name = st.text_input("Sample name or ID")
 
 # CONTINUA GUI
