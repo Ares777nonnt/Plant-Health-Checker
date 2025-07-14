@@ -82,18 +82,53 @@ def compare_to_try(species_name, user_values, try_df):
                 }
     return results
 
-# (resto del codice invariato fino a...)
+try_df = load_try_data()
+species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
 
-# Evaluation
+with open("logo.png", "rb") as f:
+    data = base64.b64encode(f.read()).decode("utf-8")
+
+st.markdown(f"""
+    <div class='header-container' style='display: flex; justify-content: center; align-items: center;'>
+        <img src='data:image/png;base64,{data}' width='300' style='margin-right:10px;' class='header-logo'/>
+        <h1 style='margin:0;'>Plant Health Checker</h1>
+    </div>
+    <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
+    <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
+""", unsafe_allow_html=True)
+
+st.markdown("<div class='section-title'>🧪 Sample Information</div>", unsafe_allow_html=True)
+species = st.text_input("Species (autocomplete)", placeholder="Start typing...")
+if species:
+    matches = sorted([s for s in species_list if species.lower() in s.lower()], key=lambda x: x.lower().startswith(species.lower()), reverse=True)
+    if matches:
+        species = st.selectbox("Suggestions", matches, index=0)
+sample_name = st.text_input("Sample name or ID")
+
+st.markdown("<div class='section-title'>📊 Physiological Parameters</div>", unsafe_allow_html=True)
+col1, col2 = st.columns(2)
+with col1:
+    fvfm = st.number_input("🍃 Fv/Fm", min_value=0.0, max_value=1.0, step=0.01)
+    chl_tot = st.number_input("🌿 Chlorophyll Total (Chl TOT)", min_value=0.0, step=0.1)
+    spad = st.number_input("🔴 SPAD Value", min_value=0.0, step=0.1)
+with col2:
+    car_tot = st.number_input("🍊 Carotenoids Total (CAR TOT)", min_value=0.0, step=0.1)
+    qp = st.number_input("💡 qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
+    qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
+
+# Qui andrebbero le funzioni evaluate_plant_health(), predict_stress_type() e show_result_card(),
+# che non erano incluse nel canvas ma sono essenziali. Vanno incollate qui per far funzionare l'app.
+
+# Valutazione
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
     stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
     show_result_card(result, stress_type, suggestion)
+
     with st.expander("📋 Stress Rule Triggers"):
         for t in triggers:
             st.markdown(f"- {t}")
 
-    # Confronto con TRY
     try_df = load_try_data()
     if isinstance(try_df, pd.DataFrame) and species:
         user_vals = {
@@ -109,7 +144,6 @@ if st.button("🔍 Evaluate Health"):
             st.markdown(f"**{trait}**: {data['Status']}  \n"
                         f"Your value: {data['User value']} | TRY avg: {data['TRY mean']} ± {data['TRY std']}")
 
-    # Salvataggio risultati
     data = {
         "timestamp": [datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
         "Species": [species],
@@ -130,3 +164,32 @@ if st.button("🔍 Evaluate Health"):
     else:
         df.to_csv("results.csv", mode='a', header=False, index=False)
     st.info("Data saved to results.csv")
+
+if os.path.exists("results.csv"):
+    st.subheader("💼 Recorded Evaluations")
+    if st.button("♻️ Reset Table"):
+        os.remove("results.csv")
+        st.warning("All recorded evaluations have been deleted.")
+    else:
+        try:
+            saved_df = pd.read_csv("results.csv")
+            st.dataframe(saved_df)
+            csv = saved_df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="📥 Download Results (CSV)",
+                data=csv,
+                file_name='results.csv',
+                mime='text/csv',
+            )
+        except pd.errors.ParserError:
+            st.error("⚠️ The results file is corrupted. Please reset the table.")
+
+st.markdown("""
+<hr class="divider">
+<div class='section-title'>📘 Interpretation of Confidence Levels</div>
+<ul>
+  <li><b>High confidence</b>: strong match with one known stress profile.</li>
+  <li><b>Medium confidence</b>: moderate consistency; some overlap possible.</li>
+  <li><b>Low confidence</b>: ambiguous or mixed stress indicators.</li>
+</ul>
+""", unsafe_allow_html=True)
