@@ -4,6 +4,64 @@ import os
 from datetime import datetime
 import base64
 
+# Imposta il layout e il titolo della pagina
+st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
+
+# CSS stile e sfondo
+st.markdown("""
+    <style>
+    html, body, [class*="css"]  {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .stApp {
+        background-color: #002220;
+        color: white;
+        padding-bottom: 120px;
+    }
+
+    .section-title {
+        font-size: 24px;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: white;
+    }
+
+    hr.divider {
+        border: none;
+        border-top: 2px dashed #bdbdbd;
+        margin: 30px 0;
+    }
+
+    @media (max-width: 768px) {
+        .header-container {
+            flex-direction: column !important;
+            text-align: center;
+        }
+        .header-container img {
+            margin-bottom: 10px;
+            width: 300px !important;
+        }
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Logo + Header
+with open("logo.png", "rb") as f:
+    data = base64.b64encode(f.read()).decode("utf-8")
+
+st.markdown(f"""
+    <div class='header-container' style='display: flex; justify-content: center; align-items: center;'>
+        <img src='data:image/png;base64,{data}' width='300' style='margin-right:10px;' class='header-logo'/>
+        <h1 style='margin:0;'>Plant Health Checker</h1>
+    </div>
+    <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
+    <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
+""", unsafe_allow_html=True)
+
 
 def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     score = 0
