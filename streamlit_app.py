@@ -178,18 +178,15 @@ def show_result_card(result, stress_type, suggestion):
     </div>
     ''', unsafe_allow_html=True)
 
-# Carica il dataset TRY da GitHub (solo nomi specie)
+# Carica dataset TRY
 try_df = pd.read_csv("https://raw.githubusercontent.com/Ares777nonnt/Plant-Health-Checker/main/try_subset.csv")
 species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
 
-# Single auto-complete box (selectbox with filtered options)
-species_query = st.text_input("🌱 Enter species name", "")
-matches = [s for s in species_list if species_query.lower() in s.lower()]
-species = st.selectbox("Select matching species", matches) if matches else species_query
-
+# Input con suggerimenti
+species = st.text_input("🌱 Start typing the species name", "")
 sample_name = st.text_input("Sample name or ID")
 
-# CONTINUA GUI
+# Parametri fisiologici
 st.markdown("<div class='section-title'>📊 Physiological Parameters</div>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 with col1:
@@ -201,6 +198,7 @@ with col2:
     qp = st.number_input("💡 qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
     qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
 
+# Valutazione
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
     stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
@@ -210,8 +208,9 @@ if st.button("🔍 Evaluate Health"):
         for t in triggers:
             st.markdown(f"- {t}")
 
-    if species in species_list:
-        subset = try_df[try_df["AccSpeciesName"] == species]
+    if species.upper() in [s.upper() for s in species_list]:
+        matched_species = [s for s in species_list if s.upper() == species.upper()][0]
+        subset = try_df[try_df["AccSpeciesName"] == matched_species]
         means = subset.groupby("AccSpeciesName").mean(numeric_only=True)
 
         trait_map = {
@@ -225,12 +224,12 @@ if st.button("🔍 Evaluate Health"):
         st.markdown("<div class='section-title'>📊 Comparison with TRY Database</div>", unsafe_allow_html=True)
         for label, trait_id in trait_map.items():
             if trait_id in means.columns:
-                mean_val = means.loc[species, trait_id]
+                mean_val = means.loc[matched_species, trait_id]
                 user_val = eval(label.lower().replace("/", "").replace(" ", "_"))
                 diff = user_val - mean_val
                 st.markdown(f"**{label}**: You = {user_val:.2f}, TRY Mean = {mean_val:.2f} → Δ = {diff:.2f}")
 
-# Footer con contatti
+# Footer contatti
 st.markdown("""
 <hr class="divider">
 <p style='text-align: center; color: lightgray;'>For inquiries or feedback, contact <a href="mailto:giuseppemuscari.gm@gmail.com">giuseppemuscari.gm@gmail.com</a></p>
