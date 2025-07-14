@@ -59,7 +59,7 @@ st.markdown(f"""
         <h1 style='margin:0;'>Plant Health Checker</h1>
     </div>
     <p style='text-align: center;'>Enter the physiological parameters of your plant to assess its health status.</p>
-    <p style='text-align: center; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025 — Contact: giuseppemuscari.gm@gmail.com</p>
+    <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
 """, unsafe_allow_html=True)
 
 
@@ -200,7 +200,7 @@ with col1:
 with col2:
     car_tot = st.number_input("🍊 Carotenoids Total (CAR TOT)", min_value=0.0, step=0.1)
     qp = st.number_input("💡 qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
-    qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)", min_value=0.0, max_value=1.0, step=0.01)
+    qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
 
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
@@ -209,28 +209,3 @@ if st.button("🔍 Evaluate Health"):
     with st.expander("📋 Stress Rule Triggers"):
         for t in triggers:
             st.markdown(f"- {t}")
-
-    # Confronto con TRY
-    comparison = {}
-    if species in try_df["AccSpeciesName"].values:
-        species_data = try_df[try_df["AccSpeciesName"] == species]
-        trait_map = {
-            "Fv/Fm": 3393,
-            "Chl TOT": 413,
-            "CAR TOT": 491,
-            "SPAD": 3001,
-            "qN": 3978
-        }
-        for trait, trait_id in trait_map.items():
-            values = species_data[species_data["TraitID"] == trait_id]["StdValue"].dropna()
-            if not values.empty:
-                avg = round(values.mean(), 2)
-                user_val = eval(trait.lower().replace("/", "").replace(" ", "_"))
-                deviation = round(user_val - avg, 2)
-                status = "⬆️ Above average" if deviation > 0.5 else ("⬇️ Below average" if deviation < -0.5 else "✅ Within range")
-                comparison[trait] = {"TRY avg": avg, "User": user_val, "Δ": deviation, "Status": status}
-
-    if comparison:
-        with st.expander("📊 Comparison with TRY Database"):
-            for trait, vals in comparison.items():
-                st.markdown(f"**{trait}**: {vals['Status']} (You: {vals['User']} | TRY Avg: {vals['TRY avg']} | Δ: {vals['Δ']})")
