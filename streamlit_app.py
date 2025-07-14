@@ -70,6 +70,52 @@ st.markdown("""
   .footer-container a:hover {{
       text-decoration: underline;
   }}
+   .contact-section {
+        text-align: center;
+        margin-top: 50px;
+        color: #ffffff;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .contact-section h2 {
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+
+    .contact-icons {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    .contact-icon {
+        text-align: center;
+        transition: transform 0.2s ease;
+    }
+
+    .contact-icon:hover {
+        transform: scale(1.1);
+    }
+
+    .contact-icon img {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 5px;
+    }
+
+    .contact-icon a {
+        display: block;
+        color: #76c7a1;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .contact-icon a:hover {
+        text-decoration: underline;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -295,13 +341,29 @@ if st.session_state.results:
 
 footer = f"""
 <div class="footer-container">
-    <div>
-    <h3>📬<b>Contacts</b></h3>
-        <a href="mailto:giuseppemuscari.gm@gmail.com">📩 Email</a> ·
-        <a href="https://www.linkedin.com/in/giuseppemuscaritomajoli" target="_blank">🔗 LinkedIn</a> ·
-        <a href="https://www.instagram.com/giuseppemuscari" target="_blank">📸 Instagram</a>
+<div class="contact-section">
+    <h2>📬 Contacts</h2>
+    <div class="contact-icons">
+        <div class="contact-icon">
+            <a href="mailto:giuseppemuscari.gm@gmail.com" target="_blank">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/new-post.png" alt="Email Icon"/>
+                Email
+            </a>
+        </div>
+        <div class="contact-icon">
+            <a href="https://www.linkedin.com/in/giuseppemuscaritomajoli" target="_blank">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/linkedin.png" alt="LinkedIn Icon"/>
+                LinkedIn
+            </a>
+        </div>
+        <div class="contact-icon">
+            <a href="https://www.instagram.com/giuseppemuscari" target="_blank">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/instagram-new.png" alt="Instagram Icon"/>
+                Instagram
+            </a>
+        </div>
     </div>
-    <div style="margin-top: 5px;">©2025 Giuseppe Muscari Tomajoli</div>
+</div>
 </div>
 """
 st.markdown(footer, unsafe_allow_html=True)
