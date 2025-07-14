@@ -183,7 +183,7 @@ try_df = pd.read_csv("https://raw.githubusercontent.com/Ares777nonnt/Plant-Healt
 species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
 
 # Input con suggerimenti
-species = st.text_input("🌱 Start typing the species name", "")
+species = st.selectbox("🌱 Select or search for the species", options=species_list, index=None, placeholder="Start typing...")
 sample_name = st.text_input("Sample name or ID")
 
 # Parametri fisiologici
