@@ -208,8 +208,8 @@ if st.button("🔍 Evaluate Health"):
         for t in triggers:
             st.markdown(f"- {t}")
 
-    if species.upper() in [s.upper() for s in species_list]:
-        matched_species = [s for s in species_list if s.upper() == species.upper()][0]
+    matched_species = next((s for s in species_list if s.lower() == species.lower()), None)
+    if matched_species:
         subset = try_df[try_df["AccSpeciesName"] == matched_species]
         means = subset.groupby("AccSpeciesName").mean(numeric_only=True)
 
