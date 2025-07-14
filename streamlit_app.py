@@ -203,6 +203,13 @@ with col2:
     qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
 
 # Valutazione
+
+    # Debug temporaneo per controllare i dati disponibili per la specie selezionata
+    st.write("Available TraitIDs for selected species:")
+    st.write(subset["TraitID"].value_counts())
+
+    st.write("Sample of TraitID + StdValue:")
+    st.dataframe(subset[["TraitID", "StdValue"]].dropna().head(20))
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
     stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
