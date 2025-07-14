@@ -213,6 +213,7 @@ if st.button("🔍 Evaluate Health"):
     show_result_card(result, stress_type, suggestion)
 
     st.session_state.results.append({
+        "Timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         "Sample Name": sample_name,
         "Species": species,
         "Fv/Fm": fvfm,
