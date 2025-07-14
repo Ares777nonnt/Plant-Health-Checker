@@ -180,6 +180,7 @@ def show_result_card(result, stress_type, suggestion):
 
 # Carica dataset TRY
 try_df = pd.read_csv("https://raw.githubusercontent.com/Ares777nonnt/Plant-Health-Checker/main/try_subset.csv")
+try_df["AccSpeciesName"] = try_df["AccSpeciesName"].str.strip().str.title()
 species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
 
 # Input con suggerimenti
