@@ -267,7 +267,7 @@ if st.session_state.results:
 
     if st.button("🗑️ Reset All Records"):
         st.session_state.results = []
-        st.experimental_rerun(), file_name="plant_health_results.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        st.experimental_rerun()
 
 # Footer contatti
 st.markdown("""
