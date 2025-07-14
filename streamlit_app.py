@@ -224,8 +224,8 @@ if st.button("🔍 Evaluate Health"):
 
         st.markdown("<div class='section-title'>📊 Comparison with TRY Database</div>", unsafe_allow_html=True)
         for label, trait_id in trait_map.items():
-            if trait_id in means.columns and not pd.isna(means.loc[matched_species, trait_id]):
-                mean_val = means.loc[matched_species, trait_id]
+    if trait_id in means.index and not pd.isna(means[trait_id]):
+        mean_val = means[trait_id]
                 user_val = eval(label.lower().replace("/", "").replace(" ", "_"))
                 diff = user_val - mean_val
                 st.markdown(f"**{label}**: You = {user_val:.2f}, TRY Mean = {mean_val:.2f} → Δ = {diff:.2f}")
