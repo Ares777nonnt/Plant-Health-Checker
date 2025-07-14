@@ -142,8 +142,23 @@ if st.button("🔍 Evaluate Health"):
         return "TBD", [], "Suggestion TBD"
 
     def show_result_card(result, stress_type, suggestion):
-        st.success(result)
-        st.info(f"Stress Type: {stress_type}\nSuggestion: {suggestion}")
+        if "Healthy" in result:
+            color = "#388e3c"
+            emoji = "🌿"
+        elif "Moderate" in result:
+            color = "#fbc02d"
+            emoji = "🌱"
+        else:
+            color = "#d32f2f"
+            emoji = "⚠️"
+
+        st.markdown(f'''
+        <div style="background-color:{color}; padding:20px; border-radius:10px; color:white;">
+            <h3 style="margin-bottom:0;">{emoji} {result}</h3>
+            <p style="font-size:16px;"><b>🔎 Stress Type:</b> {stress_type}</p>
+            <p style="font-size:16px;"><b>💡 Suggestion:</b> {suggestion}</p>
+        </div>
+        ''', unsafe_allow_html=True)
 
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
     stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
