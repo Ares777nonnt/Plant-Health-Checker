@@ -177,12 +177,8 @@ if st.button("🔍 Evaluate Health"):
         means = subset.groupby("TraitID")["StdValue"].mean()
 
         trait_map = {
-            "Fv/Fm": 3393,
-            "Chl TOT": 413,
-            "CAR TOT": 491,
-            "SPAD": 3001,
-            "qN": 3978
-        }
+    "Chl TOT": 413
+}
 
         st.markdown("<div class='section-title'>📊 Comparison with TRY Database</div>", unsafe_allow_html=True)
         for label, trait_id in trait_map.items():
