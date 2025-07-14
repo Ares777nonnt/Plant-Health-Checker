@@ -47,6 +47,29 @@ st.markdown("""
             width: 300px !important;
         }
     }
+      .footer-container {{
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      background-color: #002220;
+      color: #cccccc;
+      text-align: center;
+      padding: 20px 0;
+      margin-top: 50px;
+  }}
+  .footer-container img {{
+      width: 40px;
+      margin-bottom: 10px;
+  }}
+  .footer-container a {{
+      color: #76c7a1;
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: bold;
+  }}
+  .footer-container a:hover {{
+      text-decoration: underline;
+  }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -271,32 +294,6 @@ if st.session_state.results:
         st.success("Records have been cleared. You may manually rerun the app if needed.")
 
 footer = f"""
-<style>
-  .footer-container {{
-      position: relative;
-      bottom: 0;
-      width: 100%;
-      background-color: #002220;
-      color: #cccccc;
-      text-align: center;
-      padding: 20px 0;
-      margin-top: 50px;
-  }}
-  .footer-container img {{
-      width: 40px;
-      margin-bottom: 10px;
-  }}
-  .footer-container a {{
-      color: #76c7a1;
-      text-decoration: none;
-      margin: 0 10px;
-      font-weight: bold;
-  }}
-  .footer-container a:hover {{
-      text-decoration: underline;
-  }}
-</style>
-
 <div class="footer-container">
     <img src='data:image/png;base64,{data}' alt="Logo"/>
     <div>
