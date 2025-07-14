@@ -43,8 +43,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-@st.cache_data
 trait_map = {
+
     "Fv/Fm": 3393,
     "Chl TOT": 413,
     "SPAD": 3001,
