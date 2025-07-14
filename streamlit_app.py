@@ -296,7 +296,7 @@ if st.session_state.results:
 footer = f"""
 <div class="footer-container">
     <div>
-    <h3>📬Contacts</h3>
+    <h3>📬<b>Contacts</b></h3>
         <a href="mailto:giuseppemuscari.gm@gmail.com">📩 Email</a> ·
         <a href="https://www.linkedin.com/in/giuseppemuscaritomajoli" target="_blank">🔗 LinkedIn</a> ·
         <a href="https://www.instagram.com/giuseppemuscari" target="_blank">📸 Instagram</a>
