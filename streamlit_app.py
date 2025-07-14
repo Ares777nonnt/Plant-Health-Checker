@@ -130,7 +130,7 @@ if st.button("🔍 Evaluate Health"):
     }, try_df)
 
     if comparison:
-        with st.expander("📊 Comparison with TRY Database"):
+    with st.expander("📊 Comparison with TRY Database"):
         for trait, vals in comparison.items():
             st.markdown(f"""
             **{trait}**: {vals['Status']}  
