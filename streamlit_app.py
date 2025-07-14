@@ -211,11 +211,17 @@ if st.button("🔍 Evaluate Health"):
             st.markdown(f"- {t}")
 
     matched_species = next((s for s in species_list if s.lower() == species.lower()), None)
-    if matched_species:
-        subset = try_df[try_df["AccSpeciesName"] == matched_species]
-        means = subset.mean(numeric_only=True)
+if species:
+    st.markdown("<div class='section-title'>📊 Comparison with TRY Database</div>", unsafe_allow_html=True)
 
-        trait_map = {
+    # Filtra le righe corrispondenti alla specie selezionata
+    filtered = try_df[try_df["AccSpeciesName"].str.strip().str.lower() == species.strip().lower()]
+    
+    if filtered.empty:
+        st.warning("⚠️ No matching data found in TRY for the selected species.")
+    else:
+        # TraitIDs da analizzare
+        trait_ids = {
             "Fv/Fm": 3393,
             "Chl TOT": 413,
             "CAR TOT": 491,
@@ -223,15 +229,26 @@ if st.button("🔍 Evaluate Health"):
             "qN": 3978
         }
 
-        st.markdown("<div class='section-title'>📊 Comparison with TRY Database</div>", unsafe_allow_html=True)
-        for label, trait_id in trait_map.items():
-            if trait_id in means.index and not pd.isna(means[trait_id]):
-                mean_val = means[trait_id]
-                user_val = eval(label.lower().replace("/", "").replace(" ", "_"))
-                diff = user_val - mean_val
-                st.markdown(f"**{label}**: You = {user_val:.2f}, TRY Mean = {mean_val:.2f} → Δ = {diff:.2f}")
+        # Calcola la media dei tratti rilevanti
+        for label, tid in trait_ids.items():
+            trait_data = filtered[filtered["TraitID"] == tid]
+
+            # Se presente, calcola la media
+            if not trait_data.empty:
+                try:
+                    trait_values = pd.to_numeric(trait_data["StdValue"], errors="coerce").dropna()
+                    if not trait_values.empty:
+                        mean_val = trait_values.mean()
+                        user_val = eval(label.lower().replace("/", "").replace(" ", "_"))
+                        delta = user_val - mean_val
+                        st.markdown(f"**{label}**: You = {user_val:.2f}, TRY Mean = {mean_val:.2f} → Δ = {delta:.2f}")
+                    else:
+                        st.markdown(f"**{label}**: No numeric values available.")
+                except Exception as e:
+                    st.markdown(f"**{label}**: Error reading values: {e}")
             else:
-                st.markdown(f"**{label}**: No valid data available in TRY for this trait.")
+                st.markdown(f"**{label}**: No data found in TRY for this trait.")
+
 
     # Footer contatti
 st.markdown("""
