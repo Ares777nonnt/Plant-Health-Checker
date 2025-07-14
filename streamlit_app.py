@@ -121,6 +121,10 @@ def show_result_card(result, stress_type, suggestion):
     </div>
     ''', unsafe_allow_html=True)
 
+# Carica il dataset TRY da GitHub (solo nomi specie)
+try_df = pd.read_csv("https://raw.githubusercontent.com/Ares777nonnt/Plant-Health-Checker/main/try_subset.csv")
+species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
+
 # replace species input with empty text_input + autocomplete logic
 species_input = st.text_input("Species (start typing to search)", "")
 matches = [sp for sp in species_list if species_input.lower() in sp.lower()]
