@@ -226,11 +226,11 @@ if st.button("🔍 Evaluate Health"):
         for label, trait_id in trait_map.items():
     if trait_id in means.index and not pd.isna(means[trait_id]):
         mean_val = means[trait_id]
-                user_val = eval(label.lower().replace("/", "").replace(" ", "_"))
-                diff = user_val - mean_val
-                st.markdown(f"**{label}**: You = {user_val:.2f}, TRY Mean = {mean_val:.2f} → Δ = {diff:.2f}")
-            else:
-                st.markdown(f"**{label}**: No valid data available in TRY for this trait.")
+        user_val = eval(label.lower().replace("/", "").replace(" ", "_"))
+        diff = user_val - mean_val
+        st.markdown(f"**{label}**: You = {user_val:.2f}, TRY Mean = {mean_val:.2f} → Δ = {diff:.2f}")
+    else:
+        st.markdown(f"**{label}**: No valid data available in TRY for this trait.")
 
 # Footer contatti
 st.markdown("""
