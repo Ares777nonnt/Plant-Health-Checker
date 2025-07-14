@@ -62,6 +62,13 @@ st.markdown(f"""
     <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
 """, unsafe_allow_html=True)
 
+# Carica dataset TRY filtrato da Google Drive
+file_id = "1ERs5PVDraOtvG20KLxO-g49l8AIyFoZo"
+url = f"https://drive.google.com/uc?id={file_id}&export=download"
+try_df = pd.read_csv(url)
+try_df["AccSpeciesName"] = try_df["AccSpeciesName"].astype(str).str.strip().str.title()
+species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
+
 # Funzioni di valutazione
 
 def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
@@ -178,11 +185,6 @@ def show_result_card(result, stress_type, suggestion):
         <p style="font-size:16px;"><b>💡 Suggestion:</b> {suggestion}</p>
     </div>
     ''', unsafe_allow_html=True)
-
-# Carica dataset TRY filtrato
-try_df = pd.read_csv("https://raw.githubusercontent.com/Ares777nonnt/Plant-Health-Checker/refs/heads/main/try_filtered_traits.csv")
-try_df["AccSpeciesName"] = try_df["AccSpeciesName"].astype(str).str.strip().str.title()
-species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
 
 # Input utente
 species = st.selectbox("🌱 Select or search for the species", options=species_list, index=None, placeholder="Start typing...")
