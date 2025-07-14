@@ -1,14 +1,13 @@
-
 import streamlit as st
 import pandas as pd
 import os
 from datetime import datetime
 import base64
 
-# Imposta il layout e il titolo della pagina
+# Imposta layout e titolo
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
 
-# CSS stile e sfondo
+# Stile CSS
 st.markdown("""
     <style>
     html, body, [class*="css"]  {
@@ -50,7 +49,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Logo + Header
+# Logo + header
 with open("logo.png", "rb") as f:
     data = base64.b64encode(f.read()).decode("utf-8")
 
@@ -63,50 +62,32 @@ st.markdown(f"""
     <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
 """, unsafe_allow_html=True)
 
-
+# Funzioni di valutazione
 def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     score = 0
-    if fvfm >= 0.80:
-        score += 2
-    elif fvfm >= 0.75:
-        score += 1
-    else:
-        score -= 1
+    if fvfm >= 0.80: score += 2
+    elif fvfm >= 0.75: score += 1
+    else: score -= 1
 
-    if chl_tot >= 1.5:
-        score += 2
-    elif chl_tot >= 1.0:
-        score += 1
-    else:
-        score -= 1
+    if chl_tot >= 1.5: score += 2
+    elif chl_tot >= 1.0: score += 1
+    else: score -= 1
 
-    if car_tot >= 0.5:
-        score += 2
-    elif car_tot >= 0.3:
-        score += 1
-    else:
-        score -= 1
+    if car_tot >= 0.5: score += 2
+    elif car_tot >= 0.3: score += 1
+    else: score -= 1
 
-    if spad >= 40:
-        score += 2
-    elif spad >= 30:
-        score += 1
-    else:
-        score -= 1
+    if spad >= 40: score += 2
+    elif spad >= 30: score += 1
+    else: score -= 1
 
-    if qp >= 0.7:
-        score += 2
-    elif qp >= 0.5:
-        score += 1
-    else:
-        score -= 1
+    if qp >= 0.7: score += 2
+    elif qp >= 0.5: score += 1
+    else: score -= 1
 
-    if 0.3 <= qn <= 0.7:
-        score += 2
-    elif 0.2 <= qn < 0.3 or 0.7 < qn <= 0.8:
-        score += 1
-    else:
-        score -= 1
+    if 0.3 <= qn <= 0.7: score += 2
+    elif 0.2 <= qn < 0.3 or 0.7 < qn <= 0.8: score += 1
+    else: score -= 1
 
     if score >= 10:
         return "🌿 Healthy – Optimal physiological state"
@@ -161,15 +142,8 @@ def predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn):
         return "No specific stress pattern detected", triggers, suggestion
 
 def show_result_card(result, stress_type, suggestion):
-    if "Healthy" in result:
-        color = "#388e3c"
-        emoji = "🌿"
-    elif "Moderate" in result:
-        color = "#fbc02d"
-        emoji = "🌱"
-    else:
-        color = "#d32f2f"
-        emoji = "⚠️"
+    color = "#388e3c" if "Healthy" in result else "#fbc02d" if "Moderate" in result else "#d32f2f"
+    emoji = "🌿" if "Healthy" in result else "🌱" if "Moderate" in result else "⚠️"
 
     st.markdown(f'''
     <div style="background-color:{color}; padding:20px; border-radius:10px; color:white;">
@@ -179,16 +153,15 @@ def show_result_card(result, stress_type, suggestion):
     </div>
     ''', unsafe_allow_html=True)
 
-# Carica dataset TRY
+# Caricamento TRY database
 try_df = pd.read_csv("https://raw.githubusercontent.com/Ares777nonnt/Plant-Health-Checker/main/try_subset.csv")
-try_df["AccSpeciesName"] = try_df["AccSpeciesName"].str.strip().str.title()
+try_df["AccSpeciesName"] = try_df["AccSpeciesName"].astype(str).str.strip().str.title()
 species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
 
-# Input con suggerimenti
+# Interfaccia input
 species = st.selectbox("🌱 Select or search for the species", options=species_list, index=None, placeholder="Start typing...")
 sample_name = st.text_input("Sample name or ID")
 
-# Parametri fisiologici
 st.markdown("<div class='section-title'>📊 Physiological Parameters</div>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 with col1:
@@ -200,7 +173,7 @@ with col2:
     qp = st.number_input("💡 qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
     qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
 
-# Valutazione
+# Pulsante di valutazione
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
     stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
@@ -210,47 +183,37 @@ if st.button("🔍 Evaluate Health"):
         for t in triggers:
             st.markdown(f"- {t}")
 
-    matched_species = next((s for s in species_list if s.lower() == species.lower()), None)
-if species:
-    st.markdown("<div class='section-title'>📊 Comparison with TRY Database</div>", unsafe_allow_html=True)
+    if species:
+        st.markdown("<div class='section-title'>📊 Comparison with TRY Database</div>", unsafe_allow_html=True)
+        selected_species = species.strip().title()
+        filtered_df = try_df[try_df["AccSpeciesName"] == selected_species]
 
-    # Filtra le righe corrispondenti alla specie selezionata
-    filtered = try_df[try_df["AccSpeciesName"].str.strip().str.lower() == species.strip().lower()]
-    
-    if filtered.empty:
-        st.warning("⚠️ No matching data found in TRY for the selected species.")
-    else:
-        # TraitIDs da analizzare
-        trait_ids = {
-            "Fv/Fm": 3393,
-            "Chl TOT": 413,
-            "CAR TOT": 491,
-            "SPAD": 3001,
-            "qN": 3978
-        }
+        if filtered_df.empty:
+            st.warning(f"⚠️ No TRY data found for '{selected_species}'. Please check the name or try another species.")
+        else:
+            trait_ids = {
+                "Fv/Fm": 3393,
+                "Chl TOT": 413,
+                "CAR TOT": 491,
+                "SPAD": 3001,
+                "qN": 3978
+            }
 
-        # Calcola la media dei tratti rilevanti
-        for label, tid in trait_ids.items():
-            trait_data = filtered[filtered["TraitID"] == tid]
-
-            # Se presente, calcola la media
-            if not trait_data.empty:
-                try:
-                    trait_values = pd.to_numeric(trait_data["StdValue"], errors="coerce").dropna()
-                    if not trait_values.empty:
-                        mean_val = trait_values.mean()
+            for label, tid in trait_ids.items():
+                trait_data = filtered_df[filtered_df["TraitID"] == tid]
+                if not trait_data.empty and "StdValue" in trait_data.columns:
+                    values = pd.to_numeric(trait_data["StdValue"], errors="coerce").dropna()
+                    if not values.empty:
+                        mean_val = values.mean()
                         user_val = eval(label.lower().replace("/", "").replace(" ", "_"))
                         delta = user_val - mean_val
                         st.markdown(f"**{label}**: You = {user_val:.2f}, TRY Mean = {mean_val:.2f} → Δ = {delta:.2f}")
                     else:
-                        st.markdown(f"**{label}**: No numeric values available.")
-                except Exception as e:
-                    st.markdown(f"**{label}**: Error reading values: {e}")
-            else:
-                st.markdown(f"**{label}**: No data found in TRY for this trait.")
+                        st.markdown(f"**{label}**: No valid numeric data available in TRY.")
+                else:
+                    st.markdown(f"**{label}**: Not available for this species in TRY.")
 
-
-    # Footer contatti
+# Footer
 st.markdown("""
 <hr class="divider">
 <p style='text-align: center; color: lightgray;'>For inquiries or feedback, contact <a href="mailto:giuseppemuscari.gm@gmail.com">giuseppemuscari.gm@gmail.com</a></p>
