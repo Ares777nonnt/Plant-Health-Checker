@@ -264,7 +264,7 @@ species = st.selectbox("🌱 Select or search for the species", options=species_
 sample_name = st.text_input("Sample name or ID")
 
 # Parametri fisiologici
-st.markdown("<div class='section-title'>📊 Physiological Parameters</div>", unsafe_allow_html=True)
+st.markdown("<br><div class='section-title'>📊 Physiological Parameters</div>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 with col1:
     fvfm = st.number_input("🍃 Fv/Fm", min_value=0.0, max_value=1.0, step=0.01)
