@@ -157,13 +157,7 @@ if st.button("🔍 Evaluate Health"):
     if matched_species:
         subset = try_df[try_df["AccSpeciesName"] == matched_species]
 
-        # DEBUG: Mostra TraitID presenti
-        st.markdown("### 🔍 Debug Info")
-        st.write("Available TraitIDs for selected species:")
-        st.write(subset["TraitID"].value_counts())
-
-        st.write("Sample of TraitID + StdValue:")
-        st.dataframe(subset[["TraitID", "StdValue"]].dropna().head(20))
+        
 
         means = subset.groupby("TraitID")["StdValue"].mean()
 
