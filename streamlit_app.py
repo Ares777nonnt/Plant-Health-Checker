@@ -117,7 +117,6 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
 def predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn):
     triggers = []
     suggestion = ""
-    confidence = "Low"
 
     if fvfm < 0.75 and chl_tot < 1.0 and spad < 30:
         triggers.append("Low Fv/Fm, Chl TOT and SPAD suggest Nutrient Deficiency")
@@ -206,6 +205,33 @@ if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
     stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
     show_result_card(result, stress_type, suggestion)
+
     with st.expander("📋 Stress Rule Triggers"):
         for t in triggers:
             st.markdown(f"- {t}")
+
+    if species in species_list:
+        subset = try_df[try_df["AccSpeciesName"] == species]
+        means = subset.groupby("AccSpeciesName").mean(numeric_only=True)
+
+        trait_map = {
+            "Fv/Fm": 3393,
+            "Chl TOT": 413,
+            "CAR TOT": 491,
+            "SPAD": 3001,
+            "qN": 3978
+        }
+
+        st.markdown("<div class='section-title'>📊 Comparison with TRY Database</div>", unsafe_allow_html=True)
+        for label, trait_id in trait_map.items():
+            if trait_id in means.columns:
+                mean_val = means.loc[species, trait_id]
+                user_val = eval(label.lower().replace("/", "").replace(" ", "_"))
+                diff = user_val - mean_val
+                st.markdown(f"**{label}**: You = {user_val:.2f}, TRY Mean = {mean_val:.2f} → Δ = {diff:.2f}")
+
+# Footer con contatti
+st.markdown("""
+<hr class="divider">
+<p style='text-align: center; color: lightgray;'>For inquiries or feedback, contact <a href="mailto:giuseppemuscari.gm@gmail.com">giuseppemuscari.gm@gmail.com</a></p>
+""", unsafe_allow_html=True)
