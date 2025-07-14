@@ -125,11 +125,8 @@ def show_result_card(result, stress_type, suggestion):
 try_df = pd.read_csv("https://raw.githubusercontent.com/Ares777nonnt/Plant-Health-Checker/main/try_subset.csv")
 species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
 
-# replace species input with empty text_input + autocomplete logic
 # Species input (autocomplete + default)
 species_input = st.text_input("Species (start typing to search)", "")
-try_df = pd.read_csv("https://raw.githubusercontent.com/Ares777nonnt/Plant-Health-Checker/main/try_subset.csv")
-species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
 matches = [sp for sp in species_list if species_input.lower() in sp.lower()]
 species = st.selectbox("Select species", matches) if matches else species_input
 
