@@ -196,6 +196,38 @@ if st.button("🔍 Evaluate Health"):
             else:
                 st.markdown(f"**{label}**: No valid data available in TRY for this trait.")
 
+# Sezione download Excel
+    if "results_list" not in st.session_state:
+        st.session_state.results_list = []
+
+    new_entry = {
+        "Sample Name": sample_name,
+        "Species": species,
+        "Fv/Fm": fvfm,
+        "Chl TOT": chl_tot,
+        "CAR TOT": car_tot,
+        "SPAD": spad,
+        "qp": qp,
+        "qN": qn,
+        "Health Result": result,
+        "Stress Type": stress_type,
+        "Suggestion": suggestion
+    }
+
+    st.session_state.results_list.append(new_entry)
+    result_df = pd.DataFrame(st.session_state.results_list)
+
+    st.markdown("<div class='section-title'>⬇️ Download All Results</div>", unsafe_allow_html=True)
+    st.download_button(
+        label="📥 Download All as Excel",
+        data=result_df.to_excel(index=False, engine='openpyxl'),
+        file_name=f"plant_health_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ),
+        file_name=f"plant_health_result_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
 # Footer contatti
 st.markdown("""
 <hr class="divider">
