@@ -116,6 +116,49 @@ with col2:
     qp = st.number_input("💡 qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
     qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
 
+if st.button("🔍 Evaluate Health"):
+    result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
+    stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
+    show_result_card(result, stress_type, suggestion)
+
+    comparison = compare_to_try(species, {
+        "Fv/Fm": fvfm,
+        "Chl TOT": chl_tot,
+        "CAR TOT": car_tot,
+        "SPAD": spad,
+        "NPQ": qn
+    }, try_df)
+
+    if comparison:
+        with st.expander("📊 Comparison with TRY Database"):
+            for trait, vals in comparison.items():
+                st.markdown(f"**{trait}**: {vals['Status']}\n\n- User value: {vals['User value']}\n- TRY mean: {vals['TRY mean']}\n- TRY std: {vals['TRY std']}")
+
+    with st.expander("📋 Stress Rule Triggers"):
+        for t in triggers:
+            st.markdown(f"- {t}")
+
+    data = {
+        "timestamp": [datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
+        "Species": [species],
+        "Sample Name": [sample_name],
+        "Fv/Fm": [fvfm],
+        "Chl TOT": [chl_tot],
+        "CAR TOT": [car_tot],
+        "SPAD": [spad],
+        "qp": [qp],
+        "qN": [qn],
+        "Health Status": [result],
+        "Stress Type": [stress_type],
+        "Suggestion": [suggestion]
+    }
+    df = pd.DataFrame(data)
+    if not os.path.exists("results.csv"):
+        df.to_csv("results.csv", index=False)
+    else:
+        df.to_csv("results.csv", mode='a', header=False, index=False)
+    st.info("Data saved to results.csv")
+
 # Contact Box
 st.markdown("<div class='section-title'>📫 Contact the Author</div>", unsafe_allow_html=True)
 st.markdown("For questions, suggestions, or collaborations, please email: <a href='mailto:giuseppemuscari.gm@gmail.com'>giuseppemuscari.gm@gmail.com</a>", unsafe_allow_html=True)
