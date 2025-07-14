@@ -347,7 +347,7 @@ footer = f"""
         <div class="contact-icon">
             <a href="mailto:giuseppemuscari.gm@gmail.com" target="_blank">
                 <img src="https://img.icons8.com/ios-filled/50/ffffff/new-post.png" alt="Email Icon"/>
-                Email
+                giuseppemuscari.gm@gmail.com
             </a>
         </div>
         <div class="contact-icon">
