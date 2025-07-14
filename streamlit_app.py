@@ -363,6 +363,7 @@ footer = f"""
             </a>
         </div>
     </div>
+    <div style="margin-top: 5px;">©2025 Giuseppe Muscari Tomajoli</div>
 </div>
 </div>
 """
