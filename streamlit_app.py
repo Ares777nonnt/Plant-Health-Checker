@@ -3,7 +3,6 @@ import pandas as pd
 import os
 from datetime import datetime
 import base64
-import io
 
 # Imposta il layout e il titolo della pagina
 st.set_page_config(page_title="Plant Health App", page_icon="🌿", layout="centered")
@@ -63,30 +62,8 @@ st.markdown(f"""
     <p style='text-align: right; color: lightgray; font-size: 14px;'>Developed by Giuseppe Muscari Tomajoli ©2025</p>
 """, unsafe_allow_html=True)
 
-# Carica dataset TRY filtrato da Google Drive
-file_id = "1ERs5PVDraOtvG20KLxO-g49l8AIyFoZo"
-url = f"https://drive.google.com/uc?id={file_id}&export=download"
-try_df = pd.read_csv(url)
-try_df["AccSpeciesName"] = try_df["AccSpeciesName"].astype(str).str.strip().str.title()
-species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
+# Funzione valutazione stress
 
-# Input utente
-species = st.selectbox("🌱 Select or search for the species", options=species_list, index=None, placeholder="Start typing...")
-sample_name = st.text_input("Sample name or ID")
-
-# Parametri fisiologici
-st.markdown("<div class='section-title'>📊 Physiological Parameters</div>", unsafe_allow_html=True)
-col1, col2 = st.columns(2)
-with col1:
-    fvfm = st.number_input("🍃 Fv/Fm", min_value=0.0, max_value=1.0, step=0.01)
-    chl_tot = st.number_input("🌿 Chlorophyll Total (Chl TOT)", min_value=0.0, step=0.1)
-    spad = st.number_input("🔴 SPAD Value", min_value=0.0, step=0.1)
-with col2:
-    car_tot = st.number_input("🍊 Carotenoids Total (CAR TOT)", min_value=0.0, step=0.1)
-    qp = st.number_input("💡 qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
-    qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
-
-# Valutazione
 def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     score = 0
     if fvfm >= 0.80:
@@ -138,7 +115,52 @@ def evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn):
     else:
         return "⚠️ High stress – Likely physiological damage"
 
-def show_result_card(result):
+def predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn):
+    triggers = []
+    suggestion = ""
+
+    if fvfm < 0.75 and chl_tot < 1.0 and spad < 30:
+        triggers.append("Low Fv/Fm, Chl TOT and SPAD suggest Nutrient Deficiency")
+        suggestion = "Consider fertilizing with nitrogen-rich nutrients and monitor chlorophyll content."
+        return "Nutrient Deficiency (confidence: medium)", triggers, suggestion
+    elif fvfm < 0.75 and qp < 0.5 and qn > 0.7:
+        triggers.append("Low Fv/Fm and qp with high qN suggest Excess Light Stress")
+        suggestion = "Reduce light intensity or duration; consider partial shading during peak sunlight."
+        return "Excess Light Stress (confidence: medium)", triggers, suggestion
+    elif fvfm < 0.75 and car_tot < 0.3 and spad < 30:
+        triggers.append("Low Fv/Fm, CAR TOT and SPAD suggest Drought Stress")
+        suggestion = "Increase irrigation frequency and ensure consistent soil moisture levels."
+        return "Drought Stress (confidence: medium)", triggers, suggestion
+    elif fvfm < 0.7 and chl_tot < 1.0 and car_tot < 0.3:
+        triggers.append("Low Fv/Fm, Chl TOT and CAR TOT suggest Cold Stress")
+        suggestion = "Protect plant from low temperatures; consider temporary heating or insulation."
+        return "Cold Stress (confidence: medium)", triggers, suggestion
+    elif fvfm < 0.75 and qn > 0.7 and chl_tot < 1.0:
+        triggers.append("High qN, low Fv/Fm and Chl TOT suggest Heat Stress")
+        suggestion = "Ensure adequate ventilation and shading; avoid peak heat exposure."
+        return "Heat Stress (confidence: low)", triggers, suggestion
+    elif fvfm < 0.75 and qp < 0.5 and chl_tot < 1.0:
+        triggers.append("Low Fv/Fm, qp and Chl TOT suggest Salinity Stress")
+        suggestion = "Check salinity levels in the soil and use salt-tolerant cultivars."
+        return "Salinity Stress (confidence: low)", triggers, suggestion
+    elif fvfm < 0.7 and chl_tot < 1.0 and qp < 0.5:
+        triggers.append("Low Fv/Fm, qp and Chl TOT suggest Heavy Metal Stress")
+        suggestion = "Consider phytoremediation or reduce metal exposure in the environment."
+        return "Heavy Metal Stress (confidence: low)", triggers, suggestion
+    elif qp < 0.4 and fvfm < 0.75:
+        triggers.append("Low qp and Fv/Fm may indicate Pathogen or Biotic Stress")
+        suggestion = "Inspect for pest/pathogen presence and apply biocontrol if needed."
+        return "Biotic Stress (confidence: low)", triggers, suggestion
+    elif fvfm < 0.75 and qn > 0.7 and car_tot < 0.3:
+        triggers.append("Low Fv/Fm, CAR TOT and high qN may indicate Ozone Stress")
+        suggestion = "Minimize exposure to air pollutants and monitor for oxidative damage."
+        return "Ozone Stress (confidence: low)", triggers, suggestion
+    else:
+        triggers.append("No rules triggered based on input thresholds")
+        suggestion = "No specific corrective action identified; continue monitoring."
+        return "No specific stress pattern detected", triggers, suggestion
+
+def show_result_card(result, stress_type, suggestion):
     if "Healthy" in result:
         color = "#388e3c"
         emoji = "🌿"
@@ -152,44 +174,61 @@ def show_result_card(result):
     st.markdown(f'''
     <div style="background-color:{color}; padding:20px; border-radius:10px; color:white;">
         <h3 style="margin-bottom:0;">{emoji} {result}</h3>
+        <p style="font-size:16px;"><b>🔎 Stress Type:</b> {stress_type}</p>
+        <p style="font-size:16px;"><b>💡 Suggestion:</b> {suggestion}</p>
     </div>
     ''', unsafe_allow_html=True)
 
+# Carica dataset TRY filtrato da Google Drive
+file_id = "1ERs5PVDraOtvG20KLxO-g49l8AIyFoZo"
+url = f"https://drive.google.com/uc?id={file_id}&export=download"
+try_df = pd.read_csv(url)
+try_df["AccSpeciesName"] = try_df["AccSpeciesName"].astype(str).str.strip().str.title()
+species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
+
+# Input utente
+species = st.selectbox("🌱 Select or search for the species", options=species_list, index=None, placeholder="Start typing...")
+sample_name = st.text_input("Sample name or ID")
+
+# Parametri fisiologici
+st.markdown("<div class='section-title'>📊 Physiological Parameters</div>", unsafe_allow_html=True)
+col1, col2 = st.columns(2)
+with col1:
+    fvfm = st.number_input("🍃 Fv/Fm", min_value=0.0, max_value=1.0, step=0.01)
+    chl_tot = st.number_input("🌿 Chlorophyll Total (Chl TOT)", min_value=0.0, step=0.1)
+    spad = st.number_input("🔴 SPAD Value", min_value=0.0, step=0.1)
+with col2:
+    car_tot = st.number_input("🍊 Carotenoids Total (CAR TOT)", min_value=0.0, step=0.1)
+    qp = st.number_input("💡 qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
+    qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
+
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
-    show_result_card(result)
+    stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
+    show_result_card(result, stress_type, suggestion)
 
-    if "results_list" not in st.session_state:
-        st.session_state.results_list = []
+    with st.expander("📋 Stress Rule Triggers"):
+        for t in triggers:
+            st.markdown(f"- {t}")
 
-    new_entry = {
-        "Sample Name": sample_name,
-        "Species": species,
-        "Fv/Fm": fvfm,
-        "Chl TOT": chl_tot,
-        "CAR TOT": car_tot,
-        "SPAD": spad,
-        "qp": qp,
-        "qN": qn,
-        "Health Result": result
-    }
+    matched_species = next((s for s in species_list if s.lower() == species.lower()), None)
+    if matched_species:
+        subset = try_df[try_df["AccSpeciesName"] == matched_species]
+        means = subset.groupby("TraitID")["StdValue"].mean()
 
-    st.session_state.results_list.append(new_entry)
-    result_df = pd.DataFrame(st.session_state.results_list)
+        trait_map = {
+            "Chl TOT": 413
+        }
 
-    st.markdown("<div class='section-title'>⬇️ Download All Results</div>", unsafe_allow_html=True)
-
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        result_df.to_excel(writer, index=False, sheet_name="Plant Results")
-    excel_data = output.getvalue()
-
-    st.download_button(
-        label="📅 Download All as Excel",
-        data=excel_data,
-        file_name=f"plant_health_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+        st.markdown("<div class='section-title'>📊 Comparison with TRY Database</div>", unsafe_allow_html=True)
+        for label, trait_id in trait_map.items():
+            mean_val = means.get(trait_id, None)
+            if mean_val is not None and not pd.isna(mean_val):
+                user_val = eval(label.lower().replace("/", "").replace(" ", "_"))
+                diff = user_val - mean_val
+                st.markdown(f"**{label}**: You = {user_val:.2f}, TRY Mean = {mean_val:.2f} → Δ = {diff:.2f}")
+            else:
+                st.markdown(f"**{label}**: No valid data available in TRY for this trait.")
 
 # Footer contatti
 st.markdown("""
