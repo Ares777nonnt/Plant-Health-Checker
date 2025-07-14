@@ -295,7 +295,6 @@ if st.session_state.results:
 
 footer = f"""
 <div class="footer-container">
-    <img src='data:image/png;base64,{data}' alt="Logo"/>
     <div>
         <a href="mailto:giuseppemuscari.gm@gmail.com">📩 Email</a> ·
         <a href="https://www.linkedin.com/in/giuseppemuscaritomajoli" target="_blank">🔗 LinkedIn</a> ·
