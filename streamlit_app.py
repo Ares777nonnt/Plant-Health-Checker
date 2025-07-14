@@ -180,7 +180,7 @@ def show_result_card(result, stress_type, suggestion):
     ''', unsafe_allow_html=True)
 
 # Carica dataset TRY filtrato
-try_df = pd.read_csv("try_filtered_traits.csv")
+try_df = pd.read_csv("https://raw.githubusercontent.com/Ares777nonnt/Plant-Health-Checker/refs/heads/main/try_filtered_traits.csv")
 try_df["AccSpeciesName"] = try_df["AccSpeciesName"].astype(str).str.strip().str.title()
 species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
 
