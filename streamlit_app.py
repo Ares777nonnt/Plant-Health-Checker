@@ -123,13 +123,13 @@ if st.button("🔍 Evaluate Health"):
 
     if comparison:
         with st.expander("📊 Comparison with TRY Database"):
-        for trait, vals in comparison.items():
-            st.markdown(f"""
-            **{trait}**: {vals['Status']}  
-            - User value: {vals['User value']}  
-            - TRY mean: {vals['TRY mean']}  
-            - TRY std: {vals['TRY std']}
-            """)
+            for trait, vals in comparison.items():
+                st.markdown(f"""
+                **{trait}**: {vals['Status']}  
+                - User value: {vals['User value']}  
+                - TRY mean: {vals['TRY mean']}  
+                - TRY std: {vals['TRY std']}
+                """)
 
     with st.expander("📋 Stress Rule Triggers"):
         for t in triggers:
