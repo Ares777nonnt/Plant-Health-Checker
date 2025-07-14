@@ -257,7 +257,17 @@ if st.session_state.results:
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         result_df.to_excel(writer, index=False)
-    st.download_button("⬇️ Download Excel File", data=output.getvalue(), file_name="plant_health_results.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+    st.download_button(
+        "⬇️ Download Excel File",
+        data=output.getvalue(),
+        file_name="plant_health_results.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+    if st.button("🗑️ Reset All Records"):
+        st.session_state.results = []
+        st.experimental_rerun(), file_name="plant_health_results.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 # Footer contatti
 st.markdown("""
