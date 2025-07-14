@@ -44,6 +44,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 @st.cache_data
+trait_map = {
+    "Fv/Fm": 3393,
+    "Chl TOT": 413,
+    "SPAD": 3001,
     "CAR TOT": 491,
     "NPQ": 3978
 }
