@@ -9,7 +9,7 @@ import io
 st.set_page_config(page_title="Plant Health Checker", page_icon="🌿", layout="centered")
 
 # =============================
-# CSS – Nuovo stile coerente con il sito personale
+# CSS – Stile aggiornato con logo grande in alto e rimosso dal footer
 # =============================
 st.markdown("""
     <style>
@@ -147,7 +147,7 @@ with open("logo.png", "rb") as f:
 
 st.markdown(f"""
     <div class='hero-container'>
-        <img src='data:image/png;base64,{data}' width='250'/>
+        <img src='data:image/png;base64,{data}' width='400'/>
         <h1 class='hero-title'>Plant Health Checker</h1>
         <p class='hero-subtitle'>Inspired by astrobiology research and plant physiology</p>
         <p style='color:#d1fff0; margin-top:10px;'>Enter the physiological parameters of your plant to assess its health status.</p>
@@ -279,7 +279,6 @@ if st.session_state.results:
 # FOOTER
 footer = f"""
 <div class='footer-container'>
-    <img src='data:image/png;base64,{data}' alt='Logo'/>
     <div class='contact-icons'>
         <a href='mailto:giuseppemuscari.gm@gmail.com' class='contact-icon'>📩 Email</a>
         <a href='https://www.linkedin.com/in/giuseppemuscaritomajoli' target='_blank' class='contact-icon'>🔗 LinkedIn</a>
