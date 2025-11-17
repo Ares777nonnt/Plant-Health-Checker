@@ -5,11 +5,11 @@ from datetime import datetime
 import base64
 import io
 
-# Imposta il layout e il titolo della pagina
+# Imposta layout e titolo
 st.set_page_config(page_title="Plant Health Checker", page_icon="🌿", layout="centered")
 
 # =============================
-# CSS PERSONALIZZATO (TEMA SCURO + SFUMATURA + HERO ANIMATA)
+# CSS – Nuovo stile coerente con il sito personale
 # =============================
 st.markdown("""
     <style>
@@ -23,7 +23,7 @@ st.markdown("""
     }
 
     .stApp {
-        background: linear-gradient(to bottom, #001a17, #003c33);
+        background: linear-gradient(to bottom, #001a17, #0a3d35);
         color: white;
         padding-bottom: 120px;
         overflow-x: hidden;
@@ -31,20 +31,27 @@ st.markdown("""
 
     .hero-container {
         text-align: center;
-        padding: 80px 20px 40px 20px;
-        animation: fadeSlide 1.8s ease-in-out;
+        padding: 90px 20px 50px 20px;
+        animation: fadeIn 2s ease-in-out;
     }
 
-    @keyframes fadeSlide {
-        0% {opacity: 0; transform: translateY(40px);}
+    @keyframes fadeIn {
+        0% {opacity: 0; transform: translateY(30px);}
         100% {opacity: 1; transform: translateY(0);}
     }
 
     .hero-title {
-        font-size: 50px;
+        font-size: 54px;
         font-weight: 600;
         color: #76c7a1;
         margin-bottom: 10px;
+        text-shadow: 0 0 12px #76c7a1, 0 0 30px #2bffb1;
+        animation: glowPulse 4s infinite alternate;
+    }
+
+    @keyframes glowPulse {
+        from {text-shadow: 0 0 12px #76c7a1, 0 0 30px #2bffb1;}
+        to {text-shadow: 0 0 20px #2bffb1, 0 0 50px #76c7a1;}
     }
 
     .hero-subtitle {
@@ -55,27 +62,50 @@ st.markdown("""
 
     .section-title {
         font-size: 24px;
-        margin-top: 40px;
-        margin-bottom: 15px;
+        margin-top: 50px;
+        margin-bottom: 20px;
         font-weight: 600;
         color: #b7ffde;
         text-align: center;
+        text-shadow: 0 0 10px #00ffcc40;
+    }
+
+    .result-card {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 25px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        color: white;
+    }
+
+    .stButton button {
+        background: linear-gradient(90deg, #00b894, #2ecc71);
+        color: white;
+        border: none;
+        font-weight: 600;
+        border-radius: 10px;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 10px #00b89480;
+    }
+
+    .stButton button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px #00ffc380;
+    }
+
+    .dataframe tbody tr:hover {
+        background-color: #013e35 !important;
     }
 
     .footer-container {
-        position: relative;
-        width: 100%;
-        background-color: #001a17;
+        background: #001a17;
         color: #cccccc;
         text-align: center;
-        padding: 30px 0;
-        margin-top: 70px;
-        border-top: 1px solid #0b4a3f;
-    }
-
-    .footer-container img {
-        width: 40px;
-        margin-bottom: 10px;
+        padding: 40px 0;
+        margin-top: 80px;
+        border-top: 1px solid #1f5c4f;
     }
 
     .footer-container a {
@@ -106,25 +136,6 @@ st.markdown("""
     .contact-icon:hover img {
         transform: scale(1.15);
     }
-
-    .dataframe tbody tr:hover {
-        background-color: #014d43 !important;
-    }
-
-    .stButton button {
-        background-color: #009879;
-        color: white;
-        font-weight: 500;
-        border-radius: 8px;
-        transition: 0.2s;
-        border: none;
-    }
-
-    .stButton button:hover {
-        background-color: #00b894;
-        transform: scale(1.05);
-    }
-
     </style>
 """, unsafe_allow_html=True)
 
@@ -136,15 +147,15 @@ with open("logo.png", "rb") as f:
 
 st.markdown(f"""
     <div class='hero-container'>
-        <img src='data:image/png;base64,{data}' width='260'/>
+        <img src='data:image/png;base64,{data}' width='250'/>
         <h1 class='hero-title'>Plant Health Checker</h1>
         <p class='hero-subtitle'>Inspired by astrobiology research and plant physiology</p>
-        <p style='color: #d1fff0; margin-top:10px;'>Enter the physiological parameters of your plant to assess its health status.</p>
+        <p style='color:#d1fff0; margin-top:10px;'>Enter the physiological parameters of your plant to assess its health status.</p>
     </div>
 """, unsafe_allow_html=True)
 
 # =============================
-# LOGICA PRINCIPALE APP
+# LOGICA PRINCIPALE
 # =============================
 if "results" not in st.session_state:
     st.session_state.results = []
@@ -197,10 +208,10 @@ def predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn):
 def show_result_card(result, stress_type, suggestion):
     color = "#388e3c" if "Healthy" in result else ("#fbc02d" if "Moderate" in result else "#d32f2f")
     emoji = "🌿" if "Healthy" in result else ("🌱" if "Moderate" in result else "⚠️")
-    st.markdown(f'''<div style="background-color:{color}; padding:20px; border-radius:10px; color:white;">
-        <h3 style="margin-bottom:0;">{emoji} {result}</h3>
-        <p style="font-size:16px;"><b>🔎 Stress Type:</b> {stress_type}</p>
-        <p style="font-size:16px;"><b>💡 Suggestion:</b> {suggestion}</p>
+    st.markdown(f'''<div class="result-card" style="border-left: 5px solid {color};">
+        <h3 style="margin-bottom:0; color:{color};">{emoji} {result}</h3>
+        <p><b>🔎 Stress Type:</b> {stress_type}</p>
+        <p><b>💡 Suggestion:</b> {suggestion}</p>
     </div>''', unsafe_allow_html=True)
 
 # CARICA DATI TRY
@@ -210,7 +221,7 @@ try_df = pd.read_csv(url)
 try_df["AccSpeciesName"] = try_df["AccSpeciesName"].astype(str).str.strip().str.title()
 species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
 
-# INPUT UTENTE
+# INPUT
 species = st.selectbox("🌱 Select or search for the species", options=species_list, index=None, placeholder="Start typing...")
 sample_name = st.text_input("Sample name or ID")
 
@@ -249,7 +260,7 @@ if st.button("🔍 Evaluate Health"):
         for t in triggers:
             st.markdown(f"- {t}")
 
-# TABELLA RISULTATI
+# TABELLA
 if st.session_state.results:
     st.markdown("<div class='section-title'>📁 Sampled Records</div>", unsafe_allow_html=True)
     result_df = pd.DataFrame(st.session_state.results)
