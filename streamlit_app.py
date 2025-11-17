@@ -5,157 +5,174 @@ from datetime import datetime
 import base64
 import io
 
-# Imposta layout e titolo
 st.set_page_config(page_title="Plant Health Checker", page_icon="🌿", layout="centered")
 
 # =============================
-# CSS – Stile aggiornato con logo grande in alto e rimosso dal footer
+# CSS globale e tema coerente col sito
 # =============================
 st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-    html, body, [class*="css"]  {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        font-family: 'Poppins', sans-serif;
-    }
+html, body, [class*="css"]  {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
 
-    .stApp {
-        background: linear-gradient(to bottom, #001a17, #0a3d35);
-        color: white;
-        padding-bottom: 120px;
-        overflow-x: hidden;
-    }
+.stApp {
+    background: linear-gradient(to bottom, #001a17, #0a3d35);
+    color: white;
+    padding-bottom: 120px;
+    overflow-x: hidden;
+}
 
-    .hero-container {
-        text-align: center;
-        padding: 90px 20px 50px 20px;
-        animation: fadeIn 2s ease-in-out;
-    }
+.hero-container {
+    text-align: center;
+    padding: 90px 20px 50px 20px;
+}
 
-    @keyframes fadeIn {
-        0% {opacity: 0; transform: translateY(30px);}
-        100% {opacity: 1; transform: translateY(0);}
-    }
+.hero-container img {
+    width: 400px;
+    margin-bottom: 15px;
+}
 
-    .hero-title {
-        font-size: 54px;
-        font-weight: 600;
-        color: #76c7a1;
-        margin-bottom: 10px;
-        text-shadow: 0 0 12px #76c7a1, 0 0 30px #2bffb1;
-        animation: glowPulse 4s infinite alternate;
-    }
+.hero-title {
+    font-size: 54px;
+    font-weight: 600;
+    color: #76c7a1;
+    margin-bottom: 10px;
+    text-shadow: 0 0 12px #76c7a1, 0 0 30px #2bffb1;
+    animation: glowPulse 4s infinite alternate;
+}
 
-    @keyframes glowPulse {
-        from {text-shadow: 0 0 12px #76c7a1, 0 0 30px #2bffb1;}
-        to {text-shadow: 0 0 20px #2bffb1, 0 0 50px #76c7a1;}
-    }
+@keyframes glowPulse {
+    from {text-shadow: 0 0 12px #76c7a1, 0 0 30px #2bffb1;}
+    to {text-shadow: 0 0 20px #2bffb1, 0 0 50px #76c7a1;}
+}
 
-    .hero-subtitle {
-        font-size: 20px;
-        color: #b7ffde;
-        font-weight: 300;
-    }
+.hero-subtitle {
+    font-size: 20px;
+    color: #b7ffde;
+    font-weight: 300;
+}
 
-    .section-title {
-        font-size: 24px;
-        margin-top: 50px;
-        margin-bottom: 20px;
-        font-weight: 600;
-        color: #b7ffde;
-        text-align: center;
-        text-shadow: 0 0 10px #00ffcc40;
-    }
+.section-title {
+    font-size: 24px;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #b7ffde;
+    text-align: center;
+    text-shadow: 0 0 10px #00ffcc40;
+}
 
-    .result-card {
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 16px;
-        padding: 25px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-        color: white;
-    }
+.result-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 25px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    color: white;
+}
 
-    .stButton button {
-        background: linear-gradient(90deg, #00b894, #2ecc71);
-        color: white;
-        border: none;
-        font-weight: 600;
-        border-radius: 10px;
-        padding: 10px 20px;
-        transition: all 0.3s ease;
-        box-shadow: 0 0 10px #00b89480;
-    }
+.stButton button {
+    background: linear-gradient(90deg, #00b894, #2ecc71);
+    color: white;
+    border: none;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px #00b89480;
+}
 
-    .stButton button:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 20px #00ffc380;
-    }
+.stButton button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #00ffc380;
+}
 
-    .dataframe tbody tr:hover {
-        background-color: #013e35 !important;
-    }
+.footer-container {
+    background: linear-gradient(to right, #002c26, #001d19);
+    color: #d1fff0;
+    text-align: center;
+    padding: 60px 0 40px 0;
+    margin-top: 100px;
+    border-top: 1px solid rgba(118, 199, 161, 0.4);
+    box-shadow: 0 -5px 25px rgba(0, 255, 200, 0.08);
+}
 
-    .footer-container {
-        background: #001a17;
-        color: #cccccc;
-        text-align: center;
-        padding: 40px 0;
-        margin-top: 80px;
-        border-top: 1px solid #1f5c4f;
-    }
+.footer-container h2 {
+    font-size: 26px;
+    font-weight: 600;
+    color: #76c7a1;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+}
 
-    .footer-container a {
-        color: #76c7a1;
-        text-decoration: none;
-        margin: 0 10px;
-        font-weight: 500;
-    }
+.contact-icons {
+    display: flex;
+    justify-content: center;
+    gap: 45px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
 
-    .footer-container a:hover {
-        color: #b7ffde;
-    }
+.contact-item {
+    text-align: center;
+    transition: all 0.3s ease;
+}
 
-    .contact-icons {
-        display: flex;
-        justify-content: center;
-        gap: 25px;
-        margin-top: 15px;
-        flex-wrap: wrap;
-    }
+.contact-item a {
+    text-decoration: none;
+    color: #b7ffde;
+    font-size: 18px;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
 
-    .contact-icon img {
-        width: 30px;
-        height: 30px;
-        transition: transform 0.2s ease;
-    }
+.contact-item a:hover {
+    color: #76c7a1;
+}
 
-    .contact-icon:hover img {
-        transform: scale(1.15);
-    }
-    </style>
+.contact-item img {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    filter: drop-shadow(0 0 5px #00ffcc60);
+}
+
+.contact-item:hover img {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 12px #00ffcc);
+}
+
+.footer-container p {
+    color: #76c7a1;
+    margin-top: 25px;
+    font-size: 14px;
+}
+</style>
 """, unsafe_allow_html=True)
 
 # =============================
-# HERO SECTION
+# HEADER CON LOGO
 # =============================
 with open("logo.png", "rb") as f:
     data = base64.b64encode(f.read()).decode("utf-8")
 
 st.markdown(f"""
-    <div class='hero-container'>
-        <img src='data:image/png;base64,{data}' width='400'/>
-        <h1 class='hero-title'>Plant Health Checker</h1>
-        <p class='hero-subtitle'>Inspired by astrobiology research and plant physiology</p>
-        <p style='color:#d1fff0; margin-top:10px;'>Enter the physiological parameters of your plant to assess its health status.</p>
-    </div>
+<div class='hero-container'>
+    <img src='data:image/png;base64,{data}' alt='Logo'/>
+    <h1 class='hero-title'>Plant Health Checker</h1>
+    <p class='hero-subtitle'>Inspired by astrobiology research and plant physiology</p>
+</div>
 """, unsafe_allow_html=True)
 
 # =============================
-# LOGICA PRINCIPALE
+# FUNZIONI PRINCIPALI
 # =============================
 if "results" not in st.session_state:
     st.session_state.results = []
@@ -214,14 +231,18 @@ def show_result_card(result, stress_type, suggestion):
         <p><b>💡 Suggestion:</b> {suggestion}</p>
     </div>''', unsafe_allow_html=True)
 
-# CARICA DATI TRY
+# =============================
+# CARICA IL DATABASE TRY
+# =============================
 file_id = "1ERs5PVDraOtvG20KLxO-g49l8AIyFoZo"
 url = f"https://drive.google.com/uc?id={file_id}&export=download"
 try_df = pd.read_csv(url)
 try_df["AccSpeciesName"] = try_df["AccSpeciesName"].astype(str).str.strip().str.title()
 species_list = sorted(try_df["AccSpeciesName"].dropna().unique())
 
-# INPUT
+# =============================
+# INPUT UTENTE
+# =============================
 species = st.selectbox("🌱 Select or search for the species", options=species_list, index=None, placeholder="Start typing...")
 sample_name = st.text_input("Sample name or ID")
 
@@ -236,7 +257,9 @@ with col2:
     qp = st.number_input("💡 qp (photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
     qn = st.number_input("🔥 qN (non-photochemical quenching)", min_value=0.0, max_value=1.0, step=0.01)
 
-# VALUTAZIONE
+# =============================
+# VALUTAZIONE E OUTPUT
+# =============================
 if st.button("🔍 Evaluate Health"):
     result = evaluate_plant_health(fvfm, chl_tot, car_tot, spad, qp, qn)
     stress_type, triggers, suggestion = predict_stress_type(fvfm, chl_tot, car_tot, spad, qp, qn)
@@ -260,7 +283,9 @@ if st.button("🔍 Evaluate Health"):
         for t in triggers:
             st.markdown(f"- {t}")
 
-# TABELLA
+# =============================
+# TABELLA DEI CAMPIONI
+# =============================
 if st.session_state.results:
     st.markdown("<div class='section-title'>📁 Sampled Records</div>", unsafe_allow_html=True)
     result_df = pd.DataFrame(st.session_state.results)
@@ -276,15 +301,31 @@ if st.session_state.results:
         st.session_state.results.clear()
         st.success("Records have been cleared.")
 
-# FOOTER
+# =============================
+# FOOTER MODERNO
+# =============================
 footer = f"""
 <div class='footer-container'>
+    <h2>📬 Contacts</h2>
     <div class='contact-icons'>
-        <a href='mailto:giuseppemuscari.gm@gmail.com' class='contact-icon'>📩 Email</a>
-        <a href='https://www.linkedin.com/in/giuseppemuscaritomajoli' target='_blank' class='contact-icon'>🔗 LinkedIn</a>
-        <a href='https://www.instagram.com/giuseppemuscari' target='_blank' class='contact-icon'>📸 Instagram</a>
+        <div class='contact-item'>
+            <a href='mailto:giuseppemuscari.gm@gmail.com' target='_blank'>
+                <img src='https://img.icons8.com/ios-filled/50/76c7a1/new-post.png' alt='Email'/><br>Email
+            </a>
+        </div>
+        <div class='contact-item'>
+            <a href='https://www.linkedin.com/in/giuseppemuscaritomajoli' target='_blank'>
+                <img src='https://img.icons8.com/ios-filled/50/76c7a1/linkedin.png' alt='LinkedIn'/><br>LinkedIn
+            </a>
+        </div>
+        <div class='contact-item'>
+            <a href='https://www.instagram.com/giuseppemuscari' target='_blank'>
+                <img src='https://img.icons8.com/ios-filled/50/76c7a1/instagram-new.png' alt='Instagram'/><br>Instagram
+            </a>
+        </div>
     </div>
-    <div style='margin-top:10px; color:#76c7a1;'>©2025 Giuseppe Muscari Tomajoli</div>
+    <p>©2025 Giuseppe Muscari Tomajoli</p>
 </div>
 """
+
 st.markdown(footer, unsafe_allow_html=True)
