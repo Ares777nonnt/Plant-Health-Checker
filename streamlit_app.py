@@ -50,7 +50,7 @@ st.markdown(f"""
 # =============================
 # AI LEAF ANALYSIS VIA HUGGING FACE API
 # =============================
-HF_API_URL = "https://router.huggingface.co/liriope/PlantDiseaseDetection"
+HF_API_URL = "https://api-inference.huggingface.co/models/visionaryplants/plant-disease-classification-vit"
 
 st.markdown("<div class='section-title'>🌿 AI Leaf Image Analysis</div>", unsafe_allow_html=True)
 
@@ -72,7 +72,7 @@ if uploaded_file:
                 HF_API_URL,
                 headers={"Authorization": f"Bearer {token}"},
                 data=buffered.getvalue(),
-                timeout=30
+                timeout=60
             )
 
             if response.status_code == 200:
@@ -88,6 +88,7 @@ if uploaded_file:
                     st.error("Unexpected response format from Hugging Face API.")
             else:
                 st.error(f"Error accessing Hugging Face API: {response.status_code} – {response.text[:200]}")
+
 
 # =============================
 # PHYSIOLOGICAL ANALYSIS
