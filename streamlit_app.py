@@ -50,7 +50,7 @@ st.markdown(f"""
 # =============================
 # AI LEAF ANALYSIS VIA HUGGING FACE API
 # =============================
-HF_API_URL = "https://api-inference.huggingface.co/models/visionaryplants/plant-disease-classification-vit"
+HF_API_URL = "https://router.huggingface.co/visionaryplants/plant-disease-classification-vit"
 
 st.markdown("<div class='section-title'>🌿 AI Leaf Image Analysis</div>", unsafe_allow_html=True)
 
