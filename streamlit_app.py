@@ -5,21 +5,12 @@ from datetime import datetime
 import base64
 import io
 from PIL import Image
+import requests
 
 # =============================
 # CONFIGURAZIONE BASE
 # =============================
 st.set_page_config(page_title="Plant Health Checker", page_icon="🌿", layout="centered")
-
-# =============================
-# AI ANALYSIS: FALLBACK SYSTEM WITHOUT TORCH
-# =============================
-try:
-    import torch
-    from torchvision import transforms, models
-    TORCH_AVAILABLE = True
-except ImportError:
-    TORCH_AVAILABLE = False
 
 # =============================
 # CSS E STILE
@@ -58,8 +49,11 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # =============================
-# AI LEAF IMAGE ANALYSIS
+# AI LEAF IMAGE ANALYSIS (HUGGING FACE)
 # =============================
+HF_API_URL = "https://api-inference.huggingface.co/models/sayakpaul/leaf-disease-classification"
+HF_HEADERS = {"Authorization": f"Bearer {st.secrets['HF_API_TOKEN']}"}
+
 st.markdown("<div class='section-title'>🌿 AI Leaf Image Analysis</div>", unsafe_allow_html=True)
 
 uploaded_file = st.file_uploader("Upload a leaf image for AI-based health analysis", type=["jpg", "jpeg", "png"])
@@ -67,30 +61,21 @@ uploaded_file = st.file_uploader("Upload a leaf image for AI-based health analys
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Uploaded Leaf", use_column_width=True)
-    if TORCH_AVAILABLE:
-        st.write("Analyzing leaf health with EfficientNet... This may take a few seconds.")
-        model = models.efficientnet_b0(weights="IMAGENET1K_V1")
-        model.eval()
-        preprocess = transforms.Compose([
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ])
-        input_tensor = preprocess(image).unsqueeze(0)
-        with torch.no_grad():
-            outputs = model(input_tensor)
-            _, predicted = outputs.max(1)
-        st.success(f"AI Model suggests category ID: {predicted.item()} (demo placeholder)")
-    else:
-        st.info("⚙️ Running lightweight vision analysis (Torch not available)...")
-        avg_color = sum(image.convert('L').getdata()) / (image.size[0] * image.size[1])
-        if avg_color > 160:
-            st.success("🟢 Leaf appears healthy (bright green color detected).")
-        elif avg_color > 100:
-            st.warning("🟡 Possible mild chlorosis detected (moderate brightness).")
+
+    with st.spinner("Analyzing leaf image using Hugging Face AI model..."):
+        img_bytes = io.BytesIO()
+        image.save(img_bytes, format="JPEG")
+        response = requests.post(HF_API_URL, headers=HF_HEADERS, data=img_bytes.getvalue())
+
+    if response.status_code == 200:
+        result = response.json()
+        if isinstance(result, list) and len(result) > 0:
+            prediction = result[0]
+            st.success(f"🧠 Prediction: **{prediction['label']}** ({prediction['score']*100:.1f}% confidence)")
         else:
-            st.error("🔴 Possible stress or necrosis (dark leaf detected).")
+            st.warning("No clear classification returned by AI model.")
+    else:
+        st.error("Error accessing Hugging Face API. Please check your API key.")
 
 # =============================
 # PHYSIOLOGICAL EVALUATION + TRY DATABASE
