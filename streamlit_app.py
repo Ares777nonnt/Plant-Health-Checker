@@ -49,14 +49,14 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # =============================
-# HUGGING FACE AI LEAF ANALYSIS
+# HUGGING FACE AI LEAF ANALYSIS (MobileNetV2)
 # =============================
 st.markdown("<div class='section-title'>🌿 AI Leaf Image Analysis</div>", unsafe_allow_html=True)
 
 uploaded_file = st.file_uploader("Upload a leaf image for AI-based health analysis", type=["jpg", "jpeg", "png"])
 
 HF_API_TOKEN = st.secrets.get("HF_API_TOKEN", None)
-HF_API_URL = "https://api-inference.huggingface.co/models/liriope/PlantDiseaseDetection"
+HF_API_URL = "https://api-inference.huggingface.co/models/linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification"
 
 if uploaded_file and HF_API_TOKEN:
     image = Image.open(uploaded_file).convert("RGB")
@@ -79,7 +79,7 @@ if uploaded_file and HF_API_TOKEN:
             else:
                 st.error("Unexpected response format from Hugging Face API.")
         else:
-            st.error("Error accessing Hugging Face API. Please check your API key or model name.")
+            st.error(f"Error accessing Hugging Face API: {response.status_code} – {response.text}")
 
 elif uploaded_file and not HF_API_TOKEN:
     st.warning("⚠️ Please set your Hugging Face API token in Streamlit secrets to enable AI analysis.")
