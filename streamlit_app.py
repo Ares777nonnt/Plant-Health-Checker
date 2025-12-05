@@ -56,7 +56,7 @@ st.markdown("<div class='section-title'>🌿 AI Leaf Image Analysis</div>", unsa
 uploaded_file = st.file_uploader("Upload a leaf image for AI-based health analysis", type=["jpg", "jpeg", "png"])
 
 HF_API_TOKEN = st.secrets.get("HF_API_TOKEN", None)
-HF_API_URL = "https://api-inference.huggingface.co/models/linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification"
+HF_API_URL = "https://router.huggingface.co/linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification"
 
 if uploaded_file and HF_API_TOKEN:
     image = Image.open(uploaded_file).convert("RGB")
