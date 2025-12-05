@@ -1,10 +1,9 @@
 import streamlit as st
 import pandas as pd
-import os
-from datetime import datetime
-import base64
-import io
 import requests
+import io
+import base64
+from datetime import datetime
 from PIL import Image
 
 # =============================
@@ -13,14 +12,14 @@ from PIL import Image
 st.set_page_config(page_title="Plant Health Checker", page_icon="🌿", layout="centered")
 
 # =============================
-# CSS STILE
+# STILE E TEMA
 # =============================
 st.markdown("""
 <style>
 body {font-family: 'Poppins', sans-serif;}
 .stApp { background: linear-gradient(to bottom, #001a17, #0a3d35); color: white; }
 .hero-container { text-align: center; padding: 90px 20px 50px 20px; }
-.hero-container img { width: 480px; margin-bottom: 25px; }
+.hero-container img { width: 500px; margin-bottom: 25px; }
 .hero-title { font-size: 60px; color: #76c7a1; font-weight: 700; }
 .hero-subtitle { font-size: 22px; color: #b7ffde; }
 .section-title { font-size: 28px; text-align: center; color: #b7ffde; margin: 50px 0 25px 0; }
@@ -49,43 +48,49 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # =============================
-# HUGGING FACE AI LEAF ANALYSIS (MobileNetV2)
+# AI LEAF ANALYSIS VIA HUGGING FACE API
 # =============================
+HF_API_URL = "https://router.huggingface.co/liriope/PlantDiseaseDetection"
+
 st.markdown("<div class='section-title'>🌿 AI Leaf Image Analysis</div>", unsafe_allow_html=True)
 
 uploaded_file = st.file_uploader("Upload a leaf image for AI-based health analysis", type=["jpg", "jpeg", "png"])
 
-HF_API_TOKEN = st.secrets.get("HF_API_TOKEN", None)
-HF_API_URL = "https://router.huggingface.co/linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification"
-
-if uploaded_file and HF_API_TOKEN:
+if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Uploaded Leaf", use_column_width=True)
 
-    with st.spinner("Analyzing leaf health with AI model..."):
-        headers = {"Authorization": f"Bearer {HF_API_TOKEN}"}
-        image_bytes = io.BytesIO()
-        image.save(image_bytes, format='JPEG')
-        image_bytes = image_bytes.getvalue()
+    token = st.secrets.get("HF_API_TOKEN")
 
-        response = requests.post(HF_API_URL, headers=headers, data=image_bytes)
+    if not token:
+        st.warning("⚠️ Please set your Hugging Face API token in Streamlit secrets to enable AI analysis.")
+    else:
+        with st.spinner("Analyzing leaf with AI model..."):
+            buffered = io.BytesIO()
+            image.save(buffered, format="PNG")
+            response = requests.post(
+                HF_API_URL,
+                headers={"Authorization": f"Bearer {token}"},
+                data=buffered.getvalue(),
+                timeout=30
+            )
 
-        if response.status_code == 200:
-            result = response.json()
-            if isinstance(result, list) and len(result) > 0 and 'label' in result[0]:
-                label = result[0]['label']
-                score = result[0]['score'] * 100
-                st.markdown(f"<div class='result-card'><h3>🌱 AI Diagnosis:</h3><p><b>Prediction:</b> {label}</p><p><b>Confidence:</b> {score:.2f}%</p></div>", unsafe_allow_html=True)
+            if response.status_code == 200:
+                try:
+                    result = response.json()
+                    if isinstance(result, list) and len(result) > 0 and "label" in result[0]:
+                        label = result[0]["label"]
+                        score = result[0]["score"] * 100
+                        st.success(f"🧠 AI Diagnosis: **{label}** ({score:.1f}% confidence)")
+                    else:
+                        st.info("AI analysis completed, but no clear result returned.")
+                except Exception:
+                    st.error("Unexpected response format from Hugging Face API.")
             else:
-                st.error("Unexpected response format from Hugging Face API.")
-        else:
-            st.error(f"Error accessing Hugging Face API: {response.status_code} – {response.text}")
-
-elif uploaded_file and not HF_API_TOKEN:
-    st.warning("⚠️ Please set your Hugging Face API token in Streamlit secrets to enable AI analysis.")
+                st.error(f"Error accessing Hugging Face API: {response.status_code} – {response.text[:200]}")
 
 # =============================
-# PHYSIOLOGICAL ANALYSIS & TRY DATABASE
+# PHYSIOLOGICAL ANALYSIS
 # =============================
 if "results" not in st.session_state:
     st.session_state.results = []
@@ -150,7 +155,7 @@ if st.button("🔍 Evaluate Health"):
                 st.markdown(f"**{label}**: No valid data available in TRY for this trait.")
 
 # =============================
-# TAB RECORDS & DOWNLOAD
+# RECORDS E DOWNLOAD
 # =============================
 if st.session_state.results:
     st.markdown("<div class='section-title'>📁 Sampled Records</div>", unsafe_allow_html=True)
