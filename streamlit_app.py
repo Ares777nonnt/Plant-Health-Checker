@@ -4,6 +4,9 @@ import os
 from datetime import datetime
 import base64
 import io
+from PIL import Image
+import torch
+from torchvision import transforms, models
 
 st.set_page_config(page_title="Plant Health Checker", page_icon="🌿", layout="centered")
 
@@ -170,6 +173,29 @@ st.markdown(f"""
     <p class='hero-subtitle'>Inspired by astrobiology research and plant physiology</p>
 </div>
 """, unsafe_allow_html=True)
+
+# =============================
+# SEZIONE AI: Analisi visiva foglia
+# =============================
+st.markdown("<div class='section-title'>🌿 AI Leaf Image Analysis</div>", unsafe_allow_html=True)
+uploaded_file = st.file_uploader("Upload a leaf image for AI-based health analysis", type=["jpg", "png", "jpeg"])
+if uploaded_file:
+    image = Image.open(uploaded_file).convert("RGB")
+    st.image(image, caption="Uploaded Leaf", use_column_width=True)
+    st.write("Analyzing image using EfficientNet model...")
+    model = models.efficientnet_b0(weights="IMAGENET1K_V1")
+    model.eval()
+    preprocess = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+    input_tensor = preprocess(image).unsqueeze(0)
+    with torch.no_grad():
+        outputs = model(input_tensor)
+        _, predicted = outputs.max(1)
+    st.success(f"AI Model suggests category ID: {predicted.item()} (demo placeholder)")
 
 # =============================
 # FUNZIONI PRINCIPALI
